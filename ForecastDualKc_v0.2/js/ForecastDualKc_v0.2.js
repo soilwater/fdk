@@ -683,16 +683,16 @@ function createPlots(){
     let yieldYProb = [];
     for(i=1; i<yieldN+1; i++){yieldYProb.push(i/yieldN)}
 
-    modeBarBtns = {modeBarButtonsToRemove: ['hoverCompareCartesian', 'lasso2d']};
-    Plotly.newPlot('plotSoilWater', outputs.soilWater, { yaxis: {title: "Rootzone Soil Water (mm)"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, modeBarBtns);
-    Plotly.newPlot('plotPrecipCumulative', outputs.precipCumulative, { yaxis: {title: "Cumulative Precipitation (mm)"}, autosize: true, showlegend: false, margin: {l:80, r:20, t:10, b:80}  }, modeBarBtns);
-    Plotly.newPlot('plotETcropCumulative', outputs.ETcropCumulative, { yaxis: {title: "Cumulative ET (mm)"}, autosize: true, showlegend: true, margin: {l:80, r:20, t:10, b:80}, legend: {x: 1, xanchor: 'right', y: 1.1, orientation:"h"}, hovermode:'closest' }, modeBarBtns);
-    Plotly.newPlot('plotGrainYield', [{x:yieldXProb, y:yieldYProb, mode:'line'}], { yaxis: {title: "Cumulative Probability"}, xaxis:{title:'Grain Yield (Mg/ha)'}, autosize: true, showlegend: false, margin: {l:80, r:20, t:10, b:80}, hovermode:'closest' }, modeBarBtns);
-    //Plotly.newPlot('plotGrainYield', [{x:outputs.grainYield,type:'histogram', histnorm:'probability'}], { xaxis: {title: "Estimated Grain Yield (Mg/ha)"}, yaxis: {title: "Probability"}, autosize: true, showlegend: false, margin: {l:80, r:20, t:10, b:80}  }, modeBarBtns),
-    Plotly.newPlot('plotCanopyCover', outputs.canopyCover, { yaxis: {title: "Canopy Cover"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80}  }, modeBarBtns);
-    Plotly.newPlot('plotThermalUnits', outputs.thermalUnitsCumulative, { yaxis: {title: "Thermal Units (C-day)"}, autosize: true, showlegend: false, margin: {l:80, r:20, t:10, b:80}  }, modeBarBtns);
-    Plotly.newPlot('plotSoilWaterDeficit', outputs.soilWaterDeficit, { yaxis: {title: "Soil Water Deficit (mm)"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, modeBarBtns);
-    Plotly.newPlot('plotETPartition', outputs.evaporationCumulative, { yaxis: {title: "ET components (mm)"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, modeBarBtns);
+    config = {modeBarButtonsToRemove: ['hoverCompareCartesian', 'lasso2d'], responsive: true};
+    Plotly.newPlot('plotSoilWater', outputs.soilWater, { yaxis: {title: "Rootzone Soil Water (mm)"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
+    Plotly.newPlot('plotPrecipCumulative', outputs.precipCumulative, { yaxis: {title: "Cumulative Precipitation (mm)"}, autosize: true, showlegend: false, margin: {l:80, r:20, t:10, b:80}  }, config);
+    Plotly.newPlot('plotETcropCumulative', outputs.ETcropCumulative, { yaxis: {title: "Cumulative ET (mm)"}, autosize: true, showlegend: true, margin: {l:80, r:20, t:10, b:80}, legend: {x: 1, xanchor: 'right', y: 1.1, orientation:"h"}, hovermode:'closest' }, config);
+    Plotly.newPlot('plotGrainYield', [{x:yieldXProb, y:yieldYProb, mode:'line'}], { yaxis: {title: "Cumulative Probability"}, xaxis:{title:'Grain Yield (Mg/ha)'}, autosize: true, showlegend: false, margin: {l:80, r:20, t:10, b:80}, hovermode:'closest' }, config);
+    //Plotly.newPlot('plotGrainYield', [{x:outputs.grainYield,type:'histogram', histnorm:'probability'}], { xaxis: {title: "Estimated Grain Yield (Mg/ha)"}, yaxis: {title: "Probability"}, autosize: true, showlegend: false, margin: {l:80, r:20, t:10, b:80}  }, config),
+    Plotly.newPlot('plotCanopyCover', outputs.canopyCover, { yaxis: {title: "Canopy Cover"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80}  }, config);
+    Plotly.newPlot('plotThermalUnits', outputs.thermalUnitsCumulative, { yaxis: {title: "Thermal Units (C-day)"}, autosize: true, showlegend: false, margin: {l:80, r:20, t:10, b:80}  }, config);
+    Plotly.newPlot('plotSoilWaterDeficit', outputs.soilWaterDeficit, { yaxis: {title: "Soil Water Deficit (mm)"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
+    Plotly.newPlot('plotETPartition', outputs.evaporationCumulative, { yaxis: {title: "ET components (mm)"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
 
     let xForecasts = outputs.soilWater[0].x; // Simplified solution to generate a range of x values in the current time varaible
     let medianSoilWater = {x: xForecasts, y:computeTrend(outputs.soilWater), mode:'line', line: {color: "rgb(255, 23, 68)"}, name: "Median Soil Water"};
