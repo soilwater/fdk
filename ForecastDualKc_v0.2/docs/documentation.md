@@ -2,7 +2,25 @@
 
 ForecastDualKc is a simple in-season soil water balance ensemble prediction tool capable of generating field-specific projections of soil moisture conditions, crop water use, and probable yield outcomes based on current crop conditions and historical weather records. The model is largely based on the Food and Agricultural Organization Irrgiation and Drainage Paper #56 dual crop coefficient method (Allen et al., 1998) and is aimed at anyone interested in using an interactive tool to visualize plausible crop water use scenarios and inform in-season management decisions.
 
-## 1.   Features of the User Interface
+Table of Contents
+
+- [Model features](#features)
+- [Model modifications](#modifications)
+- [Inputs](#inputs)
+  - [Soil](#inputs-soil)
+  - [Plant](#inputs-plant)
+  - [Atmosphere](#inputs-atmosphere)
+- [Technical description](#technical-description)
+- [Datasets](#datasets)
+- [To-Do List](#to-do-list)
+- [Dependencies](#dependencies)
+- [Team](#team)
+- [References](#references)
+- [Version](#version)
+
+<a name="features"></a>
+
+## 1. Features of the User Interface
 
 - No need for software download or installation. The tool is ready to use as soon as you load the website
   
@@ -16,7 +34,9 @@ ForecastDualKc is a simple in-season soil water balance ensemble prediction tool
   
 - Allows for direct assimilation of canopy cover and soil moisture obseravtions.
 
-## 2.   Model Modifications (compared to the FAO-56 dual Kc method)
+<a name="modifications"></a>
+
+## 2. Model Modifications
 
 Feature|FAO-56|ForecastDualKc
 :---|:---|:---
@@ -26,10 +46,14 @@ Feature|FAO-56|ForecastDualKc
 `Timing of initial canopy cover computation`| From planting|From emergence
 
 >Similarly to the dual crop coefficient method described in the FAO-56 publication, this model also errs on the side of simplicity. This means that some complex biological (e.g.phenology, root growth, canopy growth) and soil physical processes (e.g. infiltration, soil water redistribution) are simulated using simplified approaches that may not always be accurate. However, the model uncertainty due to model simplifications should be partially masked by the year-to-year variability of the projected scenarios.
-  
-## 3.   Inputs
+
+<a name="inputs"></a>
+
+## 3. Inputs
 
 The model require inputs about basic soil physical properties, timing of the most important phenological stages, historical weather records, and basic management information.
+
+<a name="inputs-soil"></a>
 
 ### 3.1 Soil
 
@@ -46,6 +70,8 @@ Property|Units|Typical Range|Description
 `Curve number`|Unitless|75-92|USDA Soil Conservation Service curve number for estimating runoff. Higher numbers indicate higher runoff.
 
 >We suggest using upper limit values corresponding to a matric potential of -10 kPa instead of -33 kPa. From experience, it seems that the value at -33 kPa tends to underestimate the amount of soil water remaining and available to plants after wetting events.
+
+<a name="inputs-plant"></a>
 
 ### 3.2 Plant
 
@@ -69,6 +95,8 @@ Property|Units|Typical Range|Description
 `Yield potential`|Mg/ha|3.0-8.0|Field-specific potential yield assuming no water limitations during the growing season.
 
 >The timing of the crop stages can be highly affected by the choice of base temperature. For instance, it is widely assumed that winter wheat has a Tbase of 0 Celsius. However, values of Tbase=1 or Tbase=2 can sometimes result in better prediction of phenological stages and canopy cover.
+
+<a name="inputs-atmosphere"></a>
 
 ### 3.3 Atmosphere
 
@@ -113,7 +141,9 @@ Variable|Units|Description
 `rootzoneSoilMoistureObs`|mm|Observed soil moisture in the surface layer. The amount of water needs to be observed in the same soil depth selected in the model
 `canopyCoverObs`|%|Observed green canopy cover
 
-## 4.   Technical Description
+<a name="technical-description"></a>
+
+## 4. Technical Description
 
 The model is based on the FAO-56 Dual Crop Coefficient (Dual Kc) method (Allen et al 1998). The model relies on grass reference evapotranspiration and a set of crop coefficients that partition transpirational and evaporative losses. While the model closely follows the specifications in the FAO-56 manual, few minor modifications were introduced to enable the assimilation of field observations of green canopy cover and soil moisture from users. In this version, the basal crop coefficients (Kcb) are not determined following the traditional piecesewise linear model, but rather as a function of the fraction of green canopy cover. This not only enables a continuous and more natural shape of the crop coefficients, but also allows end users to correct the model with field observations. A simple canopy growth model was introduced to simulate canopy growth between observations.
 
@@ -163,7 +193,6 @@ $$ C_t = C_{t-1} + \frac{\TU_t}{TU_{dev}} $$
 During the late stage, the decline in green canopy cover as a result of crop senescence is modeled proportional to the $K_{cb late}$:
 
 $$ C_t = C_{t-1} + (K_{cb t} - K_{cb t-1})$$
-
 
 ### 4.4 Actual crop evapotrasnpiration
 
@@ -219,13 +248,17 @@ $ET_c$ is the total crop evapotranspiration under non-stressed conditions at the
 
 >This approach for estiamting crop yield only provides a first-order approximation assuming the use of sound yield potential values and that yield reductions are mainly caused by soil water stress. The error in yield estimation is assumed to be low compared to the year-to-year yield variabilty due to weather conditions.
 
-## 5.   Datasets
+<a name="datasets"></a>
+
+## 5. Datasets
 
 The model ships with an example dataset for winter wheat in Stillwater, OK during the 2012-2013 growing season. More information about the methods and observations can be found in the following manuscript:
 
 Lollato, R.P. and Edwards, J.T., 2015. Maximum attainable wheat yield and resource‐use efficiency in the southern Great Plains. Crop Science, 55(6), pp.2863-2876.
 
-## 6.   To-Do List
+<a name="to-do-list"></a>
+
+## 6. To-Do List
 
 - [x] Add figure showing ET partitioning
 - [x] Add figure of cumulative yield probability
@@ -233,7 +266,9 @@ Lollato, R.P. and Edwards, J.T., 2015. Maximum attainable wheat yield and resour
 - [ ] Add table in documentation with crop stages in terms of thermal units for common crops and maturity groups (e.g. wheat, soybeans, corn)
 - [ ] Add curated datasets for winter and summer crops containing periodic observations of rootzone soil moisture and canopy cover. This datasets could be used to calibrate the model and provide new users a starting point.
 
-## 7.   Model Implementation
+<a name="dependencies"></a>
+
+## 7. Model Dependencies
 
 The core of the model model was implemented in Javascript and contains no external dependencies, but few external open source libraries were used to assist with the graphical user interface:
 
@@ -243,17 +278,23 @@ The core of the model model was implemented in Javascript and contains no extern
 
 [Plotly](https://plotly.com/javascript/) for great interactive plots
 
-## 8.   Team
+<a name="team"></a>
 
-**Andres Patrignani**: Project leader. Assistant Professor in Soil Water Processes, Department of Agronomy, Kansas State University. andrespatrignani@ksu.edu
+## 8. Team
 
-**Tyson Ochsner**: Professor in Soil Physics, Department of Plant and Soil Sciences, Oklahoma State University.
+**Andres Patrignani** | Assistant Professor in Soil Water Processes, Department of Agronomy, Kansas State University. andrespatrignani@ksu.edu
 
-## 9.   References
+**Tyson Ochsner** | Professor in Soil Physics, Department of Plant and Soil Sciences, Oklahoma State University.
+
+<a name="references"></a>
+
+## 9. References
 
 - Allen, R.G., L.S. Pereira, D. Raes, and M. Smith. 1998. Crop evapotranspiration: Guidelines for computing crop water requirements, FAO Irrigation and Drainage Paper No. 56.
 
 - Lollato, R.P., Patrignani, A., Ochsner, T.E. and Edwards, J.T., 2016. Prediction of plant available water at sowing for winter wheat in the Southern Great Plains. Agronomy Journal, 108(2), pp.745-757.
 
+<a name="version"></a>
+
 <br/><br/>
-*version 0.2 - Last updated: 9-Nov-2020*
+*ForecastDualKc version 0.2 - Last updated: 9-Nov-2020 - MIT License*

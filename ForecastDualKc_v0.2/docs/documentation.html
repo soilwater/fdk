@@ -898,7 +898,27 @@ body{ margin-left:20vw; margin-right:20vw; font-size: 1.2rem; } .katex { font-si
     <body class="vscode-light">
         <h1 id="forecastdualkc-docs">ForecastDualKc Docs</h1>
 <p>ForecastDualKc is a simple in-season soil water balance ensemble prediction tool capable of generating field-specific projections of soil moisture conditions, crop water use, and probable yield outcomes based on current crop conditions and historical weather records. The model is largely based on the Food and Agricultural Organization Irrgiation and Drainage Paper #56 dual crop coefficient method (Allen et al., 1998) and is aimed at anyone interested in using an interactive tool to visualize plausible crop water use scenarios and inform in-season management decisions.</p>
-<h2 id="1-features-of-the-user-interface">1.   Features of the User Interface</h2>
+<p>Table of Contents</p>
+<ul>
+<li><a href="#features">Model features</a></li>
+<li><a href="#modifications">Model modifications</a></li>
+<li><a href="#inputs">Inputs</a>
+<ul>
+<li><a href="#inputs-soil">Soil</a></li>
+<li><a href="#inputs-plant">Plant</a></li>
+<li><a href="#inputs-atmosphere">Atmosphere</a></li>
+</ul>
+</li>
+<li><a href="#technical-description">Technical description</a></li>
+<li><a href="#datasets">Datasets</a></li>
+<li><a href="#to-do-list">To-Do List</a></li>
+<li><a href="#dependencies">Dependencies</a></li>
+<li><a href="#team">Team</a></li>
+<li><a href="#references">References</a></li>
+<li><a href="#version">Version</a></li>
+</ul>
+<p><a name="features"></a></p>
+<h2 id="1-features-of-the-user-interface">1. Features of the User Interface</h2>
 <ul>
 <li>
 <p>No need for software download or installation. The tool is ready to use as soon as you load the website</p>
@@ -919,7 +939,8 @@ body{ margin-left:20vw; margin-right:20vw; font-size: 1.2rem; } .katex { font-si
 <p>Allows for direct assimilation of canopy cover and soil moisture obseravtions.</p>
 </li>
 </ul>
-<h2 id="2-model-modifications-compared-to-the-fao-56-dual-kc-method">2.   Model Modifications (compared to the FAO-56 dual Kc method)</h2>
+<p><a name="modifications"></a></p>
+<h2 id="2-model-modifications">2. Model Modifications</h2>
 <table>
 <thead>
 <tr>
@@ -954,8 +975,10 @@ body{ margin-left:20vw; margin-right:20vw; font-size: 1.2rem; } .katex { font-si
 <blockquote>
 <p>Similarly to the dual crop coefficient method described in the FAO-56 publication, this model also errs on the side of simplicity. This means that some complex biological (e.g.phenology, root growth, canopy growth) and soil physical processes (e.g. infiltration, soil water redistribution) are simulated using simplified approaches that may not always be accurate. However, the model uncertainty due to model simplifications should be partially masked by the year-to-year variability of the projected scenarios.</p>
 </blockquote>
-<h2 id="3-inputs">3.   Inputs</h2>
+<p><a name="inputs"></a></p>
+<h2 id="3-inputs">3. Inputs</h2>
 <p>The model require inputs about basic soil physical properties, timing of the most important phenological stages, historical weather records, and basic management information.</p>
+<p><a name="inputs-soil"></a></p>
 <h3 id="31-soil">3.1 Soil</h3>
 <table>
 <thead>
@@ -1026,6 +1049,7 @@ body{ margin-left:20vw; margin-right:20vw; font-size: 1.2rem; } .katex { font-si
 <blockquote>
 <p>We suggest using upper limit values corresponding to a matric potential of -10 kPa instead of -33 kPa. From experience, it seems that the value at -33 kPa tends to underestimate the amount of soil water remaining and available to plants after wetting events.</p>
 </blockquote>
+<p><a name="inputs-plant"></a></p>
 <h3 id="32-plant">3.2 Plant</h3>
 <table>
 <thead>
@@ -1138,6 +1162,7 @@ body{ margin-left:20vw; margin-right:20vw; font-size: 1.2rem; } .katex { font-si
 <blockquote>
 <p>The timing of the crop stages can be highly affected by the choice of base temperature. For instance, it is widely assumed that winter wheat has a Tbase of 0 Celsius. However, values of Tbase=1 or Tbase=2 can sometimes result in better prediction of phenological stages and canopy cover.</p>
 </blockquote>
+<p><a name="inputs-atmosphere"></a></p>
 <h3 id="33-atmosphere">3.3 Atmosphere</h3>
 <p>In light of uncertain future environmental conditions, historical weather observations constitute the source of plausible scenarios for the model. Past weather records provide a reliable source for projecting growing season scenarios and enable end users to compare the projection of the current growing season with past wet and dry years in the region. The approach used by ForecastDualKc accounts for more than &quot;wetter than average&quot; or &quot;drier than average&quot; conditions. By using actual past weather scenarios the model accounts for the timing and amount fo precipitation events.</p>
 <p>Atmospheric observations are required in two diferent model inputs: <code>Climate</code> and <code>Observations</code>.</p>
@@ -1243,7 +1268,8 @@ year | month | day| tempMax | tempMin |rhMax | rhMin | precip | solarRad | windS
 </tr>
 </tbody>
 </table>
-<h2 id="4-technical-description">4.   Technical Description</h2>
+<p><a name="technical-description"></a></p>
+<h2 id="4-technical-description">4. Technical Description</h2>
 <p>The model is based on the FAO-56 Dual Crop Coefficient (Dual Kc) method (Allen et al 1998). The model relies on grass reference evapotranspiration and a set of crop coefficients that partition transpirational and evaporative losses. While the model closely follows the specifications in the FAO-56 manual, few minor modifications were introduced to enable the assimilation of field observations of green canopy cover and soil moisture from users. In this version, the basal crop coefficients (Kcb) are not determined following the traditional piecesewise linear model, but rather as a function of the fraction of green canopy cover. This not only enables a continuous and more natural shape of the crop coefficients, but also allows end users to correct the model with field observations. A simple canopy growth model was introduced to simulate canopy growth between observations.</p>
 <h3 id="41-reference-evapotranspiration">4.1 Reference evapotranspiration</h3>
 <p>Reference ET is modeled following the Penman-Monteith appraoch as described in Chapter 3 of the FAO-56 manual.</p>
@@ -1310,10 +1336,12 @@ year | month | day| tempMax | tempMin |rhMax | rhMin | precip | solarRad | windS
 <blockquote>
 <p>This approach for estiamting crop yield only provides a first-order approximation assuming the use of sound yield potential values and that yield reductions are mainly caused by soil water stress. The error in yield estimation is assumed to be low compared to the year-to-year yield variabilty due to weather conditions.</p>
 </blockquote>
-<h2 id="5-datasets">5.   Datasets</h2>
+<p><a name="datasets"></a></p>
+<h2 id="5-datasets">5. Datasets</h2>
 <p>The model ships with an example dataset for winter wheat in Stillwater, OK during the 2012-2013 growing season. More information about the methods and observations can be found in the following manuscript:</p>
 <p>Lollato, R.P. and Edwards, J.T., 2015. Maximum attainable wheat yield and resource‐use efficiency in the southern Great Plains. Crop Science, 55(6), pp.2863-2876.</p>
-<h2 id="6-to-do-list">6.   To-Do List</h2>
+<p><a name="to-do-list"></a></p>
+<h2 id="6-to-do-list">6. To-Do List</h2>
 <ul class="contains-task-list">
 <li class="task-list-item"><input class="task-list-item-checkbox" checked="" disabled="" type="checkbox"> Add figure showing ET partitioning</li>
 <li class="task-list-item"><input class="task-list-item-checkbox" checked="" disabled="" type="checkbox"> Add figure of cumulative yield probability</li>
@@ -1321,15 +1349,18 @@ year | month | day| tempMax | tempMin |rhMax | rhMin | precip | solarRad | windS
 <li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"> Add table in documentation with crop stages in terms of thermal units for common crops and maturity groups (e.g. wheat, soybeans, corn)</li>
 <li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"> Add curated datasets for winter and summer crops containing periodic observations of rootzone soil moisture and canopy cover. This datasets could be used to calibrate the model and provide new users a starting point.</li>
 </ul>
-<h2 id="7-model-implementation">7.   Model Implementation</h2>
+<p><a name="dependencies"></a></p>
+<h2 id="7-model-dependencies">7. Model Dependencies</h2>
 <p>The core of the model model was implemented in Javascript and contains no external dependencies, but few external open source libraries were used to assist with the graphical user interface:</p>
 <p><a href="https://materializecss.com/">Materializecss</a> for a modern responsive website layout</p>
 <p><a href="https://refreshless.com/nouislider/">noUiSlider</a> for stunning sliders</p>
 <p><a href="https://plotly.com/javascript/">Plotly</a> for great interactive plots</p>
-<h2 id="8-team">8.   Team</h2>
-<p><strong>Andres Patrignani</strong>: Project leader. Assistant Professor in Soil Water Processes, Department of Agronomy, Kansas State University. <a href="mailto:andrespatrignani@ksu.edu">andrespatrignani@ksu.edu</a></p>
-<p><strong>Tyson Ochsner</strong>: Professor in Soil Physics, Department of Plant and Soil Sciences, Oklahoma State University.</p>
-<h2 id="9-references">9.   References</h2>
+<p><a name="team"></a></p>
+<h2 id="8-team">8. Team</h2>
+<p><strong>Andres Patrignani</strong> | Assistant Professor in Soil Water Processes, Department of Agronomy, Kansas State University. <a href="mailto:andrespatrignani@ksu.edu">andrespatrignani@ksu.edu</a></p>
+<p><strong>Tyson Ochsner</strong> | Professor in Soil Physics, Department of Plant and Soil Sciences, Oklahoma State University.</p>
+<p><a name="references"></a></p>
+<h2 id="9-references">9. References</h2>
 <ul>
 <li>
 <p>Allen, R.G., L.S. Pereira, D. Raes, and M. Smith. 1998. Crop evapotranspiration: Guidelines for computing crop water requirements, FAO Irrigation and Drainage Paper No. 56.</p>
@@ -1338,8 +1369,9 @@ year | month | day| tempMax | tempMin |rhMax | rhMin | precip | solarRad | windS
 <p>Lollato, R.P., Patrignani, A., Ochsner, T.E. and Edwards, J.T., 2016. Prediction of plant available water at sowing for winter wheat in the Southern Great Plains. Agronomy Journal, 108(2), pp.745-757.</p>
 </li>
 </ul>
+<p><a name="version"></a></p>
 <p><br/><br/>
-<em>version 0.2 - Last updated: 9-Nov-2020</em></p>
+<em>ForecastDualKc version 0.2 - Last updated: 9-Nov-2020 - MIT License</em></p>
 
     </body>
     </html>
