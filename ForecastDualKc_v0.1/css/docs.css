@@ -1,0 +1,53 @@
+body{
+    margin-left:20vw;
+    margin-right:20vw;
+    font-size: 1.2rem;
+}
+
+.katex { font-size: 1em !important; } 
+
+
+h1{
+    color: rgb(104, 0, 201);
+    font-size: 3rem;
+    font-weight: 600 !important;
+    padding-bottom: 25px;
+    border-bottom: 1px solid #eee !important;
+}
+
+h2{
+    margin-top: 50px !important;
+    margin-bottom: 25px !important;
+    font-weight: 600 !important;
+    color: rgb(104, 0, 201);
+    border-bottom: 1px solid #eee !important;
+}
+
+h3{
+    margin-top: 35px !important;
+    margin-bottom: 5px !important;
+    font-weight: 600;
+}
+
+h4 {
+    margin-top: 35px !important;
+    font-weight: 600;
+}
+
+table{
+    table-layout: auto;
+}
+
+tr:nth-child(even) {background: rgb(238, 236, 236)}
+tr:nth-child(odd) {background: rgb(255, 255, 255)}
+
+blockquote{
+    border-left-color: rgb(104, 0, 201);
+    margin-top: 50px !important;
+    margin-bottom: 50px !important;
+    font-style: italic;
+}
+
+code{
+    color: tomato;
+}

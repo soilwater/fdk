@@ -1,0 +1,59 @@
+body{
+    margin: 0px;
+    padding: 10px;
+    border: 0px;
+}
+
+header, main, footer, nav {
+    padding-left: 25vw;
+}
+
+@media only screen and (max-width : 992px) {
+    header, main, footer, nav {
+        padding-left: 0;
+    }
+}
+
+.sidenav{
+    width: 25vw;
+}
+
+.model-controls {
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.custom-sidenav::-webkit-scrollbar {
+    display: none;
+}
+  
+ /* Hide scrollbar for IE, Edge and Firefox */
+.custom-sidenav {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+h6 {
+    margin-top: 50px;
+    font-size: 1.2rem;
+}
+
+label {
+    font-size: 0.8rem;
+    color: rgb(41, 41, 41);
+    margin-top: 60px;
+}
+
+.custom-slider {
+    margin-top: 10px; margin-bottom: 10px;
+}
+
+.emergence-color { background: rgb(143, 69, 0) !important}
+.dev-color { background: rgb(77, 211, 0) !important; }
+.mid-color { background: rgb(0, 163, 0) !important; }
+.late-color { background: rgb(207, 187, 0) !important; }
+
+.myplot{
+    height: 400px;
+}

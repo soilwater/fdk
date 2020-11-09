@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics     -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6S875T62E6"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-6S875T62E6');
+    </script>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fieldcaster</title>
+
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="libs/materializecss.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="css/custom.css">
+    <link rel="stylesheet" href="libs/nouislider.min.css">
+
+</head>
+
+
+<body>
+    <nav class="navbar z-depth-0 white" style="margin-top: 10px;">
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo deep-purple-text text-darken-2" style="font-size: 3.5rem; padding-left: 20px;"><b>Fieldcaster</b></a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+            <li><a href="docs/documentation.html" class="deep-purple-text text-darken-2">Docs</a></li>
+            <li><a href="" class="deep-purple-text text-darken-2">Github</a></li>
+            <li><a href="" class="deep-purple-text text-darken-2" id="downloadDataBtn" style="display: none;">Download Results</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="divider"></div>
+
+
+    
+    <ul id="slide-out" class="sidenav sidenav-fixed custom-sidenav" >
+
+        <div class="model-controls">
+
+            <!-- LOCATION CONTROLS -->
+            <h6 class="orange-text text-darken-" style="padding-left: 0px;"><b>Location</b></h6>
+            <div class="row">
+                <div class="input-field col s12 m12 l6 xl6">
+                    <input value="39.1" id="latitude" type="number" class="validate" min="-90" max="90" step="0.1">
+                    <div>Latitude</div>
+                </div>
+                <div class="input-field col s12 m12 l6 xl6">
+                    <input value="300" id="altitude" type="number" class="validate" min="-100" max="8000" step="1">
+                    <div>Altitude (m)</div>
+                </div>
+            </div>
+
+            <!-- ATMOSPHERE CONTROLS -->
+            <h6 class="blue-text text-darken-2"><b>Atmosphere</b></h6>
+            <div class="file-field input-field">
+                <div class="btn white black-text tooltipped" data-position="top" data-tooltip="File with historical data for the region.">
+                    <span>Climate Data &nbsp;</span>
+                    <input type="file" id="climateInput">
+                </div>
+                <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text">
+                </div>
+            </div>
+
+            <div class="file-field input-field">
+                <div class="btn white black-text tooltipped" data-position="top" data-tooltip="File with observations for the current growing season.">
+                    <span>OBSERVATIONS</span>
+                    <input type="file" id="weatherInput">
+                </div>
+                <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text" id="weatherFileName">
+                </div>
+            </div>
+
+            <!-- MANAGEMENT CONTROLS -->
+            <h6 class="purple-text text-darken-2"><b>Management</b></h6>
+            <div class="row">
+                <div id="managementDates" class="custom-slider"></div>
+                <div id="plantingDateSliderValue"></div>
+                <div id="forecastingDateSliderValue"></div>
+            </div>
+
+            <!-- SOIL CONTROLS -->
+            <h6 class="brown-text text-darken-1"><b>Soil</b></h6>
+            <!-- 
+            <div class="row">
+                <div class="input-field col s12 m12 l12 xl12">
+                    <select class id="soilMenu">
+                        <option value="" disabled selected>Choose your soil</option>
+                        <option value="sandyLoam">Sandy Loam</option>
+                        <option value="siltLoam">Silt Loam</option>
+                        <option value="clayLoam">Clay Loam</option>
+                    </select>
+                </div>
+            </div>
+            -->
+
+            <div class="row">
+                <div class="col s12 m12 l6 xl6">
+                    <div id="surfaceDepth" class="custom-slider tooltipped"  data-position="top" data-tooltip="Depth of evaporation layer. Typically 0.1 to 0.2 m."></div>
+                    <div id="surfaceDepthSliderValue"></div>
+                </div>
+                <div class="col s12 m12 l6 xl6">
+                    <div id="readilyEvaporableWater" class="custom-slider tooltipped" data-position="top" data-tooltip="Fraction of total evaporable water. Typically 0.5."></div>
+                    <div id="readilyEvaporableWaterSliderValue"></div>
+                </div>
+            </div>    
+
+            <div class="row">
+                <div class="col s12 m12 l6 xl6">
+                    <div id="thetaInitialSurface" class="custom-slider tooltipped" data-position="top" data-tooltip="Soil moisture of the surface layer."></div>
+                    <div id="thetaInitialSurfaceSliderValue"></div>
+                </div>
+                <div class="col s12 m12 l6 xl6">
+                    <div id="thetaInitialRootzone" class="custom-slider tooltipped" data-position="top" data-tooltip="Soil moisture of the rootzone."></div>
+                    <div id="thetaInitialRootzoneSliderValue"></div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col s12 m12 l6 xl6">
+                    <div id="lowerLimit" class="custom-slider tooltipped" data-position="top" data-tooltip="Permanent wilting point (soil water at a matric potential of -1500 kPa)"></div>
+                    <div id="lowerLimitSliderValue"></div>
+                </div>
+                <div class="col s12 m12 l6 xl6">
+                    <div id="upperLimit" class="custom-slider tooltipped" data-position="top" data-tooltip="Field capacity (soil water at a matric potential of -10 kPa)" ></div>
+                    <div id="upperLimitSliderValue"></div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col s12 m12 l6 xl6">
+                    <div id="residueCover" class="custom-slider" ></div>
+                    <div id="residueCoverSliderValue"></div>
+                </div>
+                <div class="col s12 m12 l6 xl6">
+                    <div id="wettedFraction" class="custom-slider tooltipped" data-position="top" data-tooltip="Average fraction of soil surface wetted by irrigation [0.01 to 1]"></div>
+                    <div id="wettedFractionSliderValue"></div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col s12 m12 l6 xl6">
+                    <div id="curveNumber" class="custom-slider tooltipped" data-position="top" data-tooltip="Agricultural fields typically range from 60 (low runoff) to 95 (high runoff)"></div>
+                    <div id="curveNumberSliderValue"></div>
+                </div>
+
+            </div>
+
+
+            <!-- PLANT CONTROLS -->
+            <h6 class="green-text text-darken-2 col s12"><b>Plant</b></h6>
+            <!-- 
+            <div class="row">
+                <div class="input-field col s12 m12 l12 xl12">
+                    <select id="plantMenu">
+                        <option value="" disabled selected>Choose your crop</option>
+                        <option value="winterWheat">Winter wheat</option>
+                        <option value="corn">Corn</option>
+                        <option value="soybeans">Soybeans</option>
+                    </select>
+                </div>
+            </div>
+            -->
+           
+            <div class="row">
+                <div class="col s12 m12 l12 xl12">
+                    <div>Crop stages</div>
+                    <div id="stagesDuration" class="custom-slider" ></div>
+                    <div id="emergenceSliderValue"></div>
+                    <div id="devSliderValue"></div>
+                    <div id="midSliderValue"></div>
+                    <div id="lateSliderValue"></div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col s12 m12 l12 xl12">
+                    <div>Dormant period (slide to enable)</div>
+                    <div id="dormantPeriod" class="custom-slider tooltipped" data-position="top" data-tooltip="Period where the basal crop coefficient is equal to Kcmin. Use for vernalization."></div>
+                    <div id="dormantPeriodStartSliderValue"></div>
+                    <div id="dormantPeriodEndSliderValue"></div>
+                </div>
+            </div>                      
+            <div class="row">
+                <div class="col s12 m12 l6 xl6">
+                    <div id="KcbIni" class="custom-slider tooltipped" data-position="top" data-tooltip="Minimum basal coefficient for bare soil."></div>
+                    <div id="KcbIniSliderValue"></div>
+                </div>
+                <div class="col s12 m12 l6 xl6">
+                    <div  class="custom-slider tooltipped" id="KcbFull" data-position="top" data-tooltip="Estimated basal crop coefficient during peak plant growth."></div>
+                    <div id="KcbFullSliderValue"></div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col s12 m12 l6 xl6">
+                    <div id="baseTemp" class="custom-slider"></div>
+                    <div id="baseTempSliderValue"></div>
+                </div>
+                <div class="col s12 m12 l6 xl6">
+                    <div id="upperTemp" class="custom-slider" ></div>
+                    <div id="upperTempSliderValue"></div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col s12 m12 l6 xl6">
+                    <div id="plantHeight" class="custom-slider"></div>
+                    <div id="plantHeightSliderValue"></div>
+                </div>
+                <div class="col s12 m12 l6 xl6">
+                    <div id="rootDepth" class="custom-slider" ></div>
+                    <div id="rootDepthSliderValue"></div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col s12 m12 l6 xl4">
+                    <div id="canopyGrowthRate" class="custom-slider" ></div>
+                    <div id="canopyGrowthRateSliderValue"></div>
+                </div>
+                <div class="col s12 m12 l6 xl4">
+                    <div id="canopyDeclineRate" class="custom-slider" ></div>
+                    <div id="canopyDeclineRateSliderValue"></div>
+                </div>
+                <div class="col s12 m12 l6 xl4">
+                    <div id="pTab" class="custom-slider tooltipped" data-position="top" data-tooltip="Fraction of total available water readily available for the crop. Typically 0.5."></div>  
+                    <div id="pTabSliderValue"></div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col s12 m12 l6 xl6">
+                    <div id="yieldResponse" class="custom-slider tooltipped" data-position="top" data-tooltip="Susceptibility of yield components to seasonal water stress"></div>  
+                    <div id="yieldResponseSliderValue"></div>
+                </div>
+                <div class="col s12 m12 l6 xl6">
+                    <div id="yieldPotential" class="custom-slider tooltipped" data-position="top" data-tooltip="Yield goal for your field under non-limitating conditions."></div>  
+                    <div id="yieldPotentialSliderValue"></div>
+                </div>
+            </div>
+
+
+            <!-- OTHER OPTIONS -->
+            <h6 class="grey-text text-darken-2 col s12"><b>Options</b></h6>
+            <div class="row">
+                <div class="col s12 m12 l12 xl12">
+                    <label>
+                        <input type="checkbox" id="assimilateSoilMoistureObservations"/><span>Assimilate soil moisture observations</span>
+                    </label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12 m12 l12 xl12">
+                    <label>
+                        <input type="checkbox" id="assimilateCanopyCoverObservations"/><span>Assimilate canopy cover observations</span>
+                    </label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12 m12 l12 xl12">
+                    <label>
+                        <input type="checkbox" id="constantRootDepth" checked/><span>Constant maximum root depth</span>
+                    </label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12 m12 l12 xl12">
+                    <label>
+                        <input type="checkbox" id="constantPlantHeight"/><span>Constant maximum plant height</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="row" style="display: none;">
+                <div class="col s12 m12 l12 xl12">
+                    <select id="xAxisVariableMenu">
+                        <option value="date">Date</option>
+                        <option value="daysAfterPlanting">Days after planting</option>
+                        <option value="thermalUnits">Thermal units</option>
+                    </select>
+                </div>
+            </div>
+            
+        </div>
+    </ul>
+    <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+
+
+    <!-- PLOTS -->
+    <main>
+        <div id="landing" style="padding:15vw; height: 85vh;">
+            <p class="grey-text center-align" style="font-size: 1.2rem;">Load some climate data and current meteorological observations to start using Fieldcaster. You can also download an example dataset to start generating foreacasts.</p>
+            <div class="center-align">
+                <a class="btn waves-effect deep-purple darken-2" href="fieldcaster_v0.2/dataset/dataset.zip" download="example_dataset.zip">Download example dataset</a>
+            </div>
+        </div>
+
+        <div id="plotArea" style="display: none;">
+            <div class="row">
+                <div class="col s12 m12 l12 xl6">
+                    <div id="plotSoilWater" class="myplot"></div>
+                </div>
+                <div class="col s12 m12 l12 xl6">
+                    <div id="plotPrecipCumulative" class="myplot"></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12 m12 l12 xl6">
+                    <div id="plotETcropCumulative" class="myplot"></div>
+                </div>
+                <div class="col s12 m12 l12 xl6">
+                    <div id="plotGrainYield" class="myplot"></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12 m12 l12 xl6">
+                    <div id="plotCanopyCover" class="myplot"></div>
+                </div>
+                <div class="col s12 m12 l12 xl6">
+                    <div id="plotThermalUnits" class="myplot"></div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+
+    <footer>
+        <div class="row">
+            <p class="grey-text" style="text-align: right; margin: 0px; padding-top: 0px; padding-right: 30px;">Soil Water Processes Lab - Kansas State University - Copyright 2020</p>
+        </div>
+    </footer>
+
+
+    <!-- Modal for error message -->
+    <div id="errorModal" class="modal modal-fixed-footer">
+        <div class="modal-content">
+            <p id="errorModalMsg"></p>
+        </div>
+        <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+        </div>
+    </div>
+
+
+    <script src="libs/materialize.min.js"></script>
+    <script src="libs/plotly_cartesian.min.js"></script>
+    <script src="libs/nouislider.min.js"></script>
+    <script src="libs/wNumb.min.js"></script>
+    <script src="js/fieldcaster_v0.2.js"></script>
+
+</body>
+</html>
