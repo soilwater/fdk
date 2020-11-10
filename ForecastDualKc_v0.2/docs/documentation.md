@@ -95,7 +95,7 @@ Property|Units|Typical Range|Description
 `Yield response factor`|Unitless|0.9-1.5|An empirical coefficient that relates the reduction in terms of relative yield to the reduction in ETc/ETo as a consequence of seasonal soil water deficits.
 `Yield potential`|Mg/ha|3.0-8.0|Field-specific potential yield assuming no water limitations during the growing season.
 
->The timing of the crop stages can be highly affected by the choice of base temperature. For instance, it is widely assumed that winter wheat has a Tbase of 0 Celsius. However, values of Tbase=1 or Tbase=2 can sometimes result in better prediction of phenological stages and canopy cover.
+>The timing of the crop stages can be highly affected by the choice of base temperature.
 
 <a name="inputs-atmosphere"></a>
 
