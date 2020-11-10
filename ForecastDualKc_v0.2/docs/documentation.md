@@ -17,6 +17,7 @@ Table of Contents
 - [Team](#team)
 - [References](#references)
 - [Version](#version)
+- [Reading model outputs with Matlab](read_outputs_matlab.html)
 
 <a name="features"></a>
 
