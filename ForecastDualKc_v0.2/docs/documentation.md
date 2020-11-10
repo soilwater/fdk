@@ -231,7 +231,7 @@ $T$ is crop transpiration
 
 $E$ is soil evaporation
 
-$K_{cb \ diff} are diffusive losses from the rootzone included in the basal crop coefficient (Lollato et al., 2016). The magnitude of iffusive lossses can be typically quantified in field conditions during several weeks without rainfall and vegetation.
+$K_{cb \ diff}$ are diffusive losses from the rootzone included in the basal crop coefficient (Lollato et al., 2016). The magnitude of iffusive lossses can be typically quantified in field conditions during several weeks without rainfall and vegetation.
 
 ### 4.7 Grain yield
 
