@@ -235,7 +235,7 @@ $K_{cb \ diff}$ are diffusive losses from the rootzone included in the basal cro
 
 ### 4.7 Grain yield
 
-Grain yield is approximated following th FAO Irrigation and Drainage Paper #33:
+Grain yield is approximated following th FAO Irrigation and Drainage Paper #33 (Doorenbos and Kassam, 1979):
 
 $$ \bigg( 1- \frac{Y_a}{Y_p} \bigg) = K_y \bigg(1- \frac{ET_a}{ET_c}\bigg)$$
 
@@ -293,6 +293,8 @@ The core of the model model was implemented in Javascript and contains no extern
 
 - Allen, R.G., L.S. Pereira, D. Raes, and M. Smith. 1998. Crop evapotranspiration: Guidelines for computing crop water requirements, FAO Irrigation and Drainage Paper No. 56.
 
+- Doorenbos, J. and Kassam, A.H., 1979. FAO irrigation and drainage paper No. 33 “Yield response to water”. FAO–Food and Agriculture Organization of the United Nations, Rome.
+  
 - Lollato, R.P., Patrignani, A., Ochsner, T.E. and Edwards, J.T., 2016. Prediction of plant available water at sowing for winter wheat in the Southern Great Plains. Agronomy Journal, 108(2), pp.745-757.
 
 <a name="version"></a>
