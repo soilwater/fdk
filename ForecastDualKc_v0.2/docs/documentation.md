@@ -189,11 +189,11 @@ $$TU = Tavg - Tbase $$
 
 Canopy cover ($C$) is modeled as a function of daily thermal units ($TU$). The model basically scales the range in canopy cover between the time of emergence and the end of the development stage. This approach provides a first order approximation that provides acceptable performance to partition the fraction of evaporable water. To improve the accuracy of the canopy cover model we suggest collecting and assimilating observations of green canopy cover. During the development stage, canopy growth is modeled as follows:
 
-$$ C_t = C_{t-1} + \frac{\TU_t}{TU_{dev}} $$
+$$ C_t = C_{t-1} + \frac{TU_t}{TU_{dev}} $$
 
 During the late stage, the decline in green canopy cover as a result of crop senescence is modeled proportional to the $K_{cb late}$:
 
-$$ C_t = C_{t-1} + (K_{cb t} - K_{cb t-1})$$
+$$ C_t = C_{t-1} + (K_{cb \ t} - K_{cb \ t-1})$$
 
 ### 4.4 Actual crop evapotrasnpiration
 
@@ -205,7 +205,7 @@ $$ ET_a = ET_o \ (K_{cb} K_s + K_e)$$
 
 The resulting soil water balance for the rootzone is computed by taking into account the main inputs and outputs of agricultural fields. The soil water deficit (or depletion) is computed as follows:
 
-$$Dr_t = Dr_{t-1} - (P_t - RO_t) - I_t + ETa_t + DPr_t$$
+$$Dr_t = Dr_{t-1} - (P_t - RO_t) - I_t + ET_{a \ t} + DPr_t$$
 
 $Dr$ is the depletion of the rootzone
 
