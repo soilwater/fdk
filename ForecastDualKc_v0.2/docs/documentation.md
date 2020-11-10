@@ -1,6 +1,6 @@
 # ForecastDualKc Docs
 
-ForecastDualKc is a simple in-season soil water balance ensemble prediction tool capable of generating field-specific projections of soil moisture conditions, crop water use, and probable yield outcomes based on current crop conditions and historical weather records. The model is largely based on the Food and Agricultural Organization Irrgiation and Drainage Paper #56 dual crop coefficient method (Allen et al., 1998) and is aimed at anyone interested in using an interactive tool to visualize plausible crop water use scenarios and inform in-season management decisions.
+**ForecastDualKc** is a simple in-season soil water balance ensemble prediction tool capable of generating field-specific projections of soil moisture conditions, crop water use, and probable yield outcomes based on current crop conditions and historical weather records. The model is largely based on the Food and Agricultural Organization Irrgiation and Drainage Paper #56 dual crop coefficient method (Allen et al., 1998) and is aimed at anyone interested in using an interactive tool to visualize plausible crop water use scenarios and inform in-season management decisions.
 
 Table of Contents
 
