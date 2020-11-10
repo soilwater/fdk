@@ -183,7 +183,7 @@ $$ T_{avg} = \frac{T_{max} + T_{min}}{2}$$
 $$ T_{avg} = max(T_{avg},T_{base})$$
 $$ T_{avg} = min(T_{avg},T_{upper})$$
 
-$$TU = Tavg - Tbase $$
+$$TU = T_{avg} - T_{base} $$
 
 ### 4.3 Canopy growth
 
