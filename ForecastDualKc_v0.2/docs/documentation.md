@@ -138,8 +138,8 @@ Variable|Units|Description
 
 Variable|Units|Description
 :---|:---:|:---
-`surfaceSoilMoistureObs`|mm|Observed soil moisture in the surface layer. The amount of water needs to be observed in the same soil depth selected in the model
-`rootzoneSoilMoistureObs`|mm|Observed soil moisture in the surface layer. The amount of water needs to be observed in the same soil depth selected in the model
+`surfaceSoilMoistureObs`|mm|Observed soil moisture in the surface layer.
+`rootzoneSoilMoistureObs`|mm|Observed soil moisture in the rootzone layer.
 `canopyCoverObs`|%|Observed green canopy cover
 
 <a name="technical-description"></a>
