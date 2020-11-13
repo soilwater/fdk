@@ -1,4 +1,6 @@
 ///// CONTROL ELEMENTS /////
+version = 'ForecastDualKc_v0.3';
+console.log('Running ' + version);
 
 // Initialize Materialize controls
 document.addEventListener('DOMContentLoaded', function() {
@@ -280,6 +282,7 @@ function exportProject(){
         exportData.stats = roundValuesJson(exportData.stats);
         filename += 'outputs_'
     }
+    exportData.version = 'File generated with ' + version + ' - ' + new Date().toISOString();
     exportBtn.download =  filename + 'ForecastDualKc.json';
     exportBtn.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(exportData));
 }
