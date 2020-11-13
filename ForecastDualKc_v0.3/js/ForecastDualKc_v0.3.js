@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', function() {
     M.Sidenav.init(document.querySelectorAll('.sidenav'));
     M.Tooltip.init(document.querySelectorAll('.tooltipped'));
     M.Collapsible.init(document.querySelectorAll('.collapsible'));
+  
+    // Disable all sliders on page load to prevent simualtions with no data
     document.querySelectorAll('.custom-slider').forEach(item => {
         item.setAttribute('disabled', true)
     })
@@ -16,36 +18,53 @@ document.addEventListener('DOMContentLoaded', function() {
 let climateInputElement = document.getElementById("climateInput");
 climateInputElement.addEventListener('change', function (){
     try{
-        readClimateData()
+        readClimate()
     } catch(err){
-        document.getElementById("errorModalMsg").innerHTML = err.message;
+        document.getElementById("errorModalMsg").innerText = err.message;
     }
 }, false);
 
 
-// Read weather data
-let weatherInputElement = document.getElementById("weatherInput");
-weatherInputElement.addEventListener('change', function(){
+// Read observations data
+let observationsInputElement = document.getElementById("observationsInput");
+observationsInputElement.addEventListener('change', function(){
     try{
-        readWeatherData()
+        readObservations()
     } catch(err){
-        document.getElementById("errorModalMsg").innerHTML = err.message;
+        document.getElementById("errorModalMsg").innerText = err.message;
     }
 }, false);
 
+
+// Load example dataset
+let loadExampleDatasetBtn = document.getElementById('loadExampleDatasetBtn');
+loadExampleDatasetBtn.addEventListener('click', loadExampleDataset)
+
+function loadExampleDataset(){
+    fetch('ForecastDualKc_v0.3/dataset/example_field_settings_inputs_ForecastDualKc.json')
+    .then( results=>results.text() )
+    .then( data=>runUploadProject(JSON.parse(data)))
+}
+
+// Input box project name
+let projectNameElement = document.getElementById('projectName');
+
+// Input dateset description
+let projectDescriptionElement = document.getElementById('projectDescription');
 
 // Input box latitude
 let latitudeElement = document.getElementById('latitude');
 
-
 // Input box altitude
 let altitudeElement = document.getElementById('altitude');
-
 
 // Input xaxis variable
 let  xAxisVariableMenu = document.getElementById('xAxisVariableMenu');
 xAxisVariableMenu.addEventListener('change', run);
 
+// Visualize scenarios
+let visualizeScenarios = document.getElementById('visualizeScenarios');
+visualizeScenarios.addEventListener('change', run);
 
 // Assimilate soil moisture observations
 let assimilateSoilMoistureObservations = document.getElementById('assimilateSoilMoistureObservations');
@@ -59,11 +78,9 @@ assimilateCanopyCoverObservations.addEventListener('change', run);
 let constantRootDepth = document.getElementById('constantRootDepth');
 constantRootDepth.addEventListener('change', run);
 
-
 // Input constant plant height
 let constantPlantHeight = document.getElementById('constantPlantHeight');
 constantPlantHeight.addEventListener('change', run);
-
 
 // Slider planting and forecasting date
 var managementDatesSlider = document.getElementById('managementDates');
@@ -149,7 +166,7 @@ let iniSliderValue = document.getElementById('iniSliderValue');
 let devSliderValue = document.getElementById('devSliderValue');
 let midSliderValue = document.getElementById('midSliderValue');
 let lateSliderValue = document.getElementById('lateSliderValue');
-noUiSlider.create(stagesDurationSlider, { start:[100, 1000, 1400, 2000, 2400], connect:[true, true, true, true, true, false], range:{'min':0, 'max':2800}, step: 10, margin: 10, format: wNumb({decimals: 0}) });
+noUiSlider.create(stagesDurationSlider, { start:[150, 1000, 1400, 2000, 2400], connect:[true, true, true, true, true, false], range:{'min':0, 'max':2800}, step: 10, margin: 10, format: wNumb({decimals: 0}) });
 stagesDurationSlider.noUiSlider.on('update', function (values, handle) { 
     if(handle == 0){ 
         emergenceSliderValue.innerHTML = 'Emergence: ' + values[handle] + ' thermal units';
@@ -239,6 +256,75 @@ noUiSlider.create(pTabSlider, { start: 0.5, range: {'min': 0.1, 'max': 0.8}, ste
 pTabSlider.noUiSlider.on('update', function (values, handle) { pTabSliderValue.innerHTML = 'pTab: ' + values[handle]; });
 
 
+// Export Data
+let exportBtn = document.getElementById("exportBtn");
+exportBtn.addEventListener('click', exportProject);
+
+function exportProject(){
+    let filename = geolocation.name + '_';
+    let exportData = {};
+    if(document.getElementById('exportSettingsBox').checked){
+        exportData.settings = {geolocation,soil,plant,management,options};
+        filename += 'settings_'
+    }
+
+    if(document.getElementById('exportInputsBox').checked){
+        exportData.inputs = {climate,observations};
+        filename += 'inputs_'
+    }
+
+    if(document.getElementById('exportOutputsBox').checked){
+        exportData.outputs = {...outputs};
+        exportData.outputs = roundValuesJson(exportData.outputs);
+        exportData.stats = {...stats};
+        exportData.stats = roundValuesJson(exportData.stats);
+        filename += 'outputs_'
+    }
+    exportBtn.download =  filename + 'ForecastDualKc.json';
+    exportBtn.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(exportData));
+}
+
+function roundValuesJson(J){
+    for(let key in J){
+        for(let i=0; i<J[key].length; i++){
+            if(J[key][i].hasOwnProperty('y')){
+                for(let j=0; j<J[key][i].y.length; j++){
+                    J[key][i].y[j] = Math.round(J[key][i].y[j]*100)/100
+                }
+            }
+        }
+    }
+    return J;
+}
+
+
+// Import Data
+let importBtn = document.getElementById("importBtn");
+importBtn.addEventListener('change', importProject, false);
+
+function importProject(e){
+    const reader = new FileReader();
+    reader.readAsText(importBtn.files[0]);
+    reader.onload = function(){ 
+        runUploadProject(JSON.parse(reader.result));
+    }
+}
+
+function runUploadProject(data){
+    if(data.hasOwnProperty('settings') & data.hasOwnProperty('inputs')){
+        setSettings(data.settings);
+        climate = data.inputs.climate;
+        observations = data.inputs.observations;
+        run()
+    } else if(data.hasOwnProperty('settings') & !data.hasOwnProperty('inputs')){
+        alert('Your project file only contains settings. Please load climate and current observations first.')
+    } else {
+        alert('There was an error loading your data. File might have the wrong format.')
+    } 
+}
+
+
+
 ///// EVENTLISTENERS /////
 document.querySelectorAll('.custom-slider').forEach(item => {
     item.noUiSlider.on('change', run);
@@ -250,29 +336,30 @@ function enableSliders(){
     document.querySelectorAll('.custom-slider').forEach(item => {
         item.removeAttribute('disabled');
     })
-
     document.getElementById('landing').style.display = 'none';
     document.getElementById('plotArea').style.display = 'block';
+    document.getElementById('xAxisVariableMenu').parentElement.parentElement.parentElement.style.display = 'block';
 }
 
 
-
 ///// GLOBAL VARIABLES /////
+let settings = {};
 let outputs = {};
+let stats = {};
 let plant = {};
 let soil = {};
 let management = {};
 let geolocation = {};
 let options = {};
-let weather = [];
+let observations = [];
 let climate = [];
-let isWeatherLoaded = false;
+let observationsHaveBeenLoaded = false;
 let isPlotLoaded = false;
 
 
 ///// PARSE CLIMATE DATA FILE /////
-function readClimateData (){
-    collectModelInputs()
+function readClimate (){
+    collectModelSettingsFromDOM()
     const reader = new FileReader();
     reader.onload = function(e){ 
        let lines = reader.result.split('\n');
@@ -287,22 +374,24 @@ function readClimateData (){
                     precip:parseFloat(values[7]), solarRad:parseFloat(values[8]), windSpeed:parseFloat(values[9])} );
             }
         };
-        for(let i=0; i<climate.length; i++){ climate[i].tempAvg = (climate[i].tempMax + climate[i].tempMin)/2}
-        for(let i=0; i<climate.length; i++){ climate[i].date = new Date(climate[i].year, climate[i].month-1, climate[i].day) }
+        for(let i=0; i<climate.length; i++){ climate[i].tempAvg = Math.round( (climate[i].tempMax + climate[i].tempMin)/2 * 100)/100 }
+        for(let i=0; i<climate.length; i++){ climate[i].date = new Date(climate[i].year, climate[i].month-1, climate[i].day).getTime() }
         for(let i=0; i<climate.length; i++){ climate[i].doy = getDayOfYear(climate[i].date) }
         for(let i=0; i<climate.length; i++){ climate[i].ETref = computeReferenceET(geolocation,climate[i], 'grass')}
         M.toast({html: 'Climate loaded!'})
         e.target.value = '';
-        if(isWeatherLoaded){run()}
+
+        observationsInputElement.disabled = false;
+        if(observationsHaveBeenLoaded){run()}
+
     }
     reader.readAsText(climateInputElement.files[0])
-
 }
 
 
-///// PARSE WEATHER DATA FILE /////
-function readWeatherData (){
-    collectModelInputs()
+///// PARSE OBSERVATIONS DATA FILE /////
+function readObservations (){
+    collectModelSettingsFromDOM()
     const reader = new FileReader();
     reader.onload = function(e){ 
         let lines = reader.result.split('\n');
@@ -310,14 +399,14 @@ function readWeatherData (){
         
         if(headers.length > 14){
             M.toast({html: 'Too many variables in spreadsheet'})
-            document.getElementById('weatherFileName').value = ''; 
+            document.getElementById('observationsFileName').value = ''; 
         }
 
         // Start from second array. First array is for the headers
         for(let i=1; i<lines.length; i++){
             if(lines[i].length > 0){
                 let values = lines[i].split(',');
-                weather.push( { year:parseInt(values[0]), month:parseInt(values[1]), day:parseInt(values[2]), 
+                observations.push( { year:parseInt(values[0]), month:parseInt(values[1]), day:parseInt(values[2]), 
                                 tempMax:parseFloat(values[3]), tempMin:parseFloat(values[4]), 
                                 rhMax:parseFloat(values[5]), rhMin:parseFloat(values[6]),
                                 precip:parseFloat(values[7]), solarRad:parseFloat(values[8]), windSpeed:parseFloat(values[9]),
@@ -326,42 +415,51 @@ function readWeatherData (){
             }
         }
 
-        for(let i=0; i<weather.length; i++){ weather[i].tempAvg = (weather[i].tempMax + weather[i].tempMin)/2}
-        for(let i=0; i<weather.length; i++){ weather[i].date = new Date(weather[i].year, weather[i].month-1, weather[i].day) }
-        for(let i=0; i<weather.length; i++){ weather[i].doy = getDayOfYear(weather[i].date) }
-        for(let i=0; i<weather.length; i++){ weather[i].ETref = computeReferenceET(geolocation, weather[i], 'grass')}
+        for(let i=0; i<observations.length; i++){ observations[i].tempAvg = Math.round( (observations[i].tempMax + observations[i].tempMin)/2 * 100)/100 }
+        for(let i=0; i<observations.length; i++){ observations[i].date = new Date(observations[i].year, observations[i].month-1, observations[i].day).getTime() }
+        for(let i=0; i<observations.length; i++){ observations[i].doy = getDayOfYear(observations[i].date) }
+        for(let i=0; i<observations.length; i++){ observations[i].ETref = computeReferenceET(geolocation, observations[i], 'grass')}
 
         M.toast({html: 'Observations loaded!'})
         e.target.value = '';
 
-        let startDate =  timestamp(weather[0].year, weather[0].month, weather[0].day);
-        let endDate = timestamp(weather[weather.length-1].year, weather[weather.length-1].month, weather[weather.length-1].day);
+        let L = observations.length-1;
+        let N = Math.max(L-15,0);
+        let startDate = timestamp(observations[0].year, observations[0].month, observations[0].day);
+        let endDate = timestamp(observations[L].year, observations[L].month, observations[L].day);
+        let forecastDate = timestamp(observations[N].year, observations[N].month, observations[N].day);
 
-        // Update management slider with weather boundaries
+        // Update management slider with observations boundaries
         managementDatesSlider.noUiSlider.updateOptions( {range: {'min': startDate, 'max': endDate} }); // Update the range of the date slider       
-        managementDatesSlider.noUiSlider.set( [startDate,endDate]); // Set the date slider using the first and last dates of the weather dataset
+        managementDatesSlider.noUiSlider.set([startDate,forecastDate]); // Set the date slider using the first and last dates of the observations dataset
         
-        isWeatherLoaded = true;
+        observationsHaveBeenLoaded = true;
         run()
     }
-    reader.readAsText(weatherInputElement.files[0])
+    reader.readAsText(observationsInputElement.files[0])
 }
 
 
 
 ///// DEFINE MAIN FUNCTION /////
+//createPlots()
 function run(){
-    collectModelInputs()
-    fieldcaster()
-    createPlots()
+    collectModelSettingsFromDOM()
+    model()
+    updatePlots()
     enableSliders()
-    setDownloadRawOutputs()
     addFieldObservationsToPlot()
 }
 
 
-///// COLLECT UP MODEL INPUTS /////
-function collectModelInputs(){
+///// COLLECT UP MODEL settings /////
+function collectModelSettingsFromDOM(){
+    geolocation = { name: projectNameElement.value,
+                    altitude: parseFloat(altitudeElement.value), 
+                    latitude: parseFloat(latitudeElement.value),
+                    description: projectDescriptionElement.value
+    };
+
     plant = {KcbIni: parseFloat(KcbIniSlider.noUiSlider.get()),
             KcbMid: parseFloat(KcbMidSlider.noUiSlider.get()),
             KcbEnd: parseFloat(KcbEndSlider.noUiSlider.get()),
@@ -389,17 +487,17 @@ function collectModelInputs(){
             wettedFraction: parseFloat(wettedFractionSlider.noUiSlider.get()),
             curveNumber: parseFloat(curveNumberSlider.noUiSlider.get())
     };
-    
-    geolocation = {altitude: parseFloat(altitudeElement.value), 
-                   latitude: parseFloat(latitudeElement.value)
-    };
-    
+        
     management = {plantingDate: new Date(parseInt(managementDatesSlider.noUiSlider.get()[0])), 
                   forecastingDate: new Date(parseInt(managementDatesSlider.noUiSlider.get()[1])),
-                  plantingToForecast: ( parseInt(managementDatesSlider.noUiSlider.get()[1]) - parseInt(managementDatesSlider.noUiSlider.get()[0]) )/86400000
+                  plantingToForecast: ( parseInt(managementDatesSlider.noUiSlider.get()[1]) - parseInt(managementDatesSlider.noUiSlider.get()[0]) )/86400000,
+                  endDate: managementDatesSlider.noUiSlider.options.range.max
     };
 
     options = {
+        visualizeScenarios: visualizeScenarios.checked,
+        assimilateCanopyCoverObservations: assimilateCanopyCoverObservations.checked,
+        assimilateSoilMoistureObservations: assimilateSoilMoistureObservations.checked,
         constantRootDepth: constantRootDepth.checked,
         constantPlantHeight: constantPlantHeight.checked
     };
@@ -407,7 +505,7 @@ function collectModelInputs(){
 }
 
 // ///// FAO-56 MODEL /////
-function fieldcaster(){
+function model(){
 
     // Pre-allocate objects
     outputs.xAxisMode;
@@ -433,17 +531,11 @@ function fieldcaster(){
             let n = 0;
             let growingSeasonDays = [];
             let growingSeasonDate = [];
-
             let ETref;
-            let tempMax;
-            let tempMin;
-            let rhMax;
             let rhMin;
             let precip;
             let windSpeed;
-            let solarRad;
             let tempAvg;
-
             let irrigation = [];
             let E = [];
             let T = [];
@@ -490,15 +582,15 @@ function fieldcaster(){
 
             while (inGrowingSeason){
                 if(n < management.plantingToForecast){
-                    ETref = weather[n].ETref;
-                    tempMax = weather[n].tempMax;
-                    tempAvg = weather[n].tempAvg;
-                    tempMin = weather[n].tempMin;
-                    rhMax = weather[n].rhMax;
-                    rhMin = weather[n].rhMin;
-                    precip = weather[n].precip;
-                    windSpeed = weather[n].windSpeed;
-                    irrigation[n] = weather[n].irrigation;
+                    ETref = observations[n].ETref;
+                    tempMax = observations[n].tempMax;
+                    tempAvg = observations[n].tempAvg;
+                    tempMin = observations[n].tempMin;
+                    rhMax = observations[n].rhMax;
+                    rhMin = observations[n].rhMin;
+                    precip = observations[n].precip;
+                    windSpeed = observations[n].windSpeed;
+                    irrigation[n] = observations[n].irrigation;
                 } else {
                     ETref = climate[k].ETref;
                     tempMax = climate[k].tempMax;
@@ -574,15 +666,12 @@ function fieldcaster(){
                     if(thermalUnitsCumulative[n] < plant.emergenceThermalUnits){
                         fc[n] = 0;
                     } else if (thermalUnitsCumulative[n] >= plant.emergenceThermalUnits && thermalUnitsCumulative[n] < plant.devThermalUnits){
-                        if(fc[n-1] == 0){
-                            fc[n] = 0.01;
-                        } else {
-                           fc[n] = Math.min( fc[n-1] + thermalUnits/plant.devThermalUnits,0.99)
-                        }
+                        fc[n] = Math.min( fc[n-1] + thermalUnits/(plant.devThermalUnits - plant.emergenceThermalUnits),0.99)
                     } else if (thermalUnitsCumulative[n] >= plant.devThermalUnits && thermalUnitsCumulative[n] < plant.midThermalUnits){
                         fc[n] = fc[n-1];
                     } else {
                         fc[n] = Math.max(fc[n-1] + (Kcb[n] - Kcb[n-1]), 0);
+                        //fc[n] = Math.max(fc[n-1] - thermalUnits/(plant.lateThermalUnits - plant.midThermalUnits), 0);
                     }
 
                     few = Math.min(1 - fc[n], soil.wettedFraction);
@@ -625,19 +714,18 @@ function fieldcaster(){
 
                 // Assimilate Field Observations
                 if(assimilateSoilMoistureObservations.checked && n < management.plantingToForecast){
-                    if(!isNaN(weather[n].surfaceSoilWaterObs)){
-                        De[n] = (soil.upperLimit * soil.surfaceDepth) - weather[n].surfaceSoilWaterObs;
+                    if(typeof observations[n].surfaceSoilWaterObs === 'number'){
+                        De[n] = (soil.upperLimit * soil.surfaceDepth) - observations[n].surfaceSoilWaterObs;
                         De[n] = Math.max(De[n],0);
                     }
-                    if(!isNaN(weather[n].rootzoneSoilWaterObs)){
-                        Dr[n] = (soil.upperLimit * plant.rootDepth * 1000) - weather[n].rootzoneSoilWaterObs;
-                        Dr[n] = Math.max(Dr[n],0);
+                    if(typeof observations[n].rootzoneSoilWaterObs  === 'number'){
+                        Dr[n] = (soil.upperLimit * plant.rootDepth * 1000) - observations[n].rootzoneSoilWaterObs;
                     }
                 }
 
                 if(assimilateCanopyCoverObservations.checked && n < management.plantingToForecast){
-                    if(!isNaN(weather[n].canopyCoverObs)){
-                        fc[n] = weather[n].canopyCoverObs/100;
+                    if(typeof observations[n].canopyCoverObs === 'number'){
+                        fc[n] = observations[n].canopyCoverObs/100;
                     }
                 }
 
@@ -648,6 +736,7 @@ function fieldcaster(){
                     // Compute grain yield
                     grainYield = plant.yieldPotential * (1 - plant.yieldResponse * (1 - ETcropCumulative[n]/ETcropCumulativeNoStress[n])); // Eq. 90, FAO-56 (based on FAO-33)
                     grainYield = Math.max(grainYield,0);
+
                     // Save output variables
                     let currentYear = climate[k].year;
                     if(xAxisVariableMenu.value === 'date'){
@@ -659,19 +748,20 @@ function fieldcaster(){
                     }
 
                     // Save outputs
+                    lineColor = "rgba(220, 220, 220, 0.7)";
                     outputs.xAxisMode = xAxisVariableMenu.value;
-                    outputs.ETcropCumulative.push({x:xVariable, y:ETcropCumulative, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: "rgb(220, 220, 220)"}});
-                    outputs.ETrefCumulative.push({x:xVariable, y:ETrefCumulative, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: "rgb(220, 220, 220)"}});
-                    outputs.precipCumulative.push({x:xVariable, y:precipCumulative, mode:'line', name:"Y"+currentYear, line: {color: "rgb(220, 220, 220)"}});
-                    outputs.soilWater.push({x:xVariable, y:soilWater, mode:'line', name:"Y"+currentYear, line: {color: "rgb(220, 220, 220)"} });
-                    outputs.canopyCover.push({x:xVariable, y:fc, mode:'line', name:"Y"+currentYear, line: {color: "rgb(220, 220, 220)"}});
-                    outputs.thermalUnitsCumulative.push({x:xVariable, y:thermalUnitsCumulative, mode:'line', name:"Y"+currentYear, line: {color: "rgb(220, 220, 220)"}});
-                    outputs.grainYield.push(grainYield)
-                    outputs.evaporationCumulative.push({x:xVariable, y:evaporationCumulative, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: "rgb(220, 220, 220)"}});
-                    outputs.transpirationCumulative.push({x:xVariable, y:transpirationCumulative, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: "rgb(220, 220, 220)"}});
-                    outputs.soilWaterDeficit.push({x:xVariable, y:soilWaterDeficit, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: "rgb(220, 220, 220)"}});
-                    outputs.evaporation.push({x:xVariable, y:E, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: "rgb(220, 220, 220)"}});
-                    outputs.transpiration.push({x:xVariable, y:T, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: "rgb(220, 220, 220)"}});
+                    outputs.ETcropCumulative.push({x:xVariable, y:ETcropCumulative, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: lineColor}});
+                    outputs.ETrefCumulative.push({x:xVariable, y:ETrefCumulative, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: lineColor}});
+                    outputs.precipCumulative.push({x:xVariable, y:precipCumulative, mode:'line', name:"Y"+currentYear, line: {color: lineColor}});
+                    outputs.soilWater.push({x:xVariable, y:soilWater, mode:'line', name:"Y"+currentYear, line: {color: lineColor} });
+                    outputs.canopyCover.push({x:xVariable, y:fc, mode:'line', name:"Y"+currentYear, line: {color: lineColor}});
+                    outputs.thermalUnitsCumulative.push({x:xVariable, y:thermalUnitsCumulative, mode:'line', name:"Y"+currentYear, line: {color: lineColor}});
+                    outputs.grainYield.push({x:currentYear, y:grainYield})
+                    outputs.evaporationCumulative.push({x:xVariable, y:evaporationCumulative, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: lineColor}});
+                    outputs.transpirationCumulative.push({x:xVariable, y:transpirationCumulative, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: lineColor}});
+                    outputs.soilWaterDeficit.push({x:xVariable, y:soilWaterDeficit, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: lineColor}});
+                    outputs.evaporation.push({x:xVariable, y:E, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: lineColor}});
+                    outputs.transpiration.push({x:xVariable, y:T, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: lineColor}});
                     inGrowingSeason = false; // This will break the current while loop
                 }
 
@@ -683,90 +773,135 @@ function fieldcaster(){
         }
         k += 1;
     } // End while for climate
+    summaryStats()
 }
 
 
 ///// PLOTS /////
-function createPlots(){
+function summaryStats(){
+
     // Compute cumulative probability yield
-    let yieldXProb =  outputs.grainYield.sort();
     let yieldN = outputs.grainYield.length;
+    let yieldXProb = [];
     let yieldYProb = [];
-    for(i=1; i<yieldN+1; i++){yieldYProb.push(i/yieldN)}
+    for(let i=0; i<yieldN; i++){
+        yieldXProb.push(outputs.grainYield[i].y);
+        //yieldYProb.push((i+1)/yieldN);
+        yieldYProb.push( 1 - ((i+1)/yieldN));
+    }
+    yieldXProb = yieldXProb.sort();
+    let grainYieldCumulativeProbability = {x:yieldXProb, y:yieldYProb, mode:'line'};
 
+    let xForecasts = outputs.soilWater[0].x; // Simplified solution in line with inputVar[0] in percentile()
+
+    // Soil Water
+    let soilWater25 = {x: xForecasts, y:computeTrend(outputs.soilWater, 25), mode:'line', line: {color: "rgb(255, 23, 68)", dash: 'dot'}, name: "Lower Bound"};
+    let soilWater50 = {x: xForecasts, y:computeTrend(outputs.soilWater, 50), mode:'line', line: {color: "rgb(255, 23, 68)"}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Median Soil Water"};
+    let soilWater75 = {x: xForecasts, y:computeTrend(outputs.soilWater, 75), mode:'line', line: {color: "rgb(255, 23, 68)", dash: 'dot'}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Upper Bound"};
+    stats.soilWater = [soilWater25, soilWater50, soilWater75];
+
+    // Soil Water Deficit
+    let soilWaterDeficit25 = {x: xForecasts, y:computeTrend(outputs.soilWaterDeficit, 25), mode:'line', line: {color: "rgb(255, 23, 68)", dash: 'dot'}, name: "Lower Bound"};
+    let soilWaterDeficit50 = {x: xForecasts, y:computeTrend(outputs.soilWaterDeficit, 50), mode:'line', line: {color: "rgb(255, 23, 68)"}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Median Soil Water Deficit"};
+    let soilWaterDeficit75 = {x: xForecasts, y:computeTrend(outputs.soilWaterDeficit, 75), mode:'line', line: {color: "rgb(255, 23, 68)", dash: 'dot'}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Upper Bound"};
+    stats.soilWaterDeficit = [soilWaterDeficit25, soilWaterDeficit50, soilWaterDeficit75];
+
+    // Canopy Cover
+    let canopyCover25 = {x: xForecasts, y:computeTrend(outputs.canopyCover, 25), mode:'line', line: {color: "rgb(0, 150, 0)", dash: 'dot'}, name: "Lower Bound"};
+    let canopyCover50 = {x: xForecasts, y:computeTrend(outputs.canopyCover, 50), mode:'line', line: {color: "rgb(0, 150, 0)"}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Median Canopy Cover"};
+    let canopyCover75 = {x: xForecasts, y:computeTrend(outputs.canopyCover, 75), mode:'line', line: {color: "rgb(0, 150, 0)", dash: 'dot'}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Upper Bound"};
+    stats.canopyCover = [canopyCover25, canopyCover50, canopyCover75];
+
+    // ETcrop Cumulative
+    let ETcropCumulative25 = {x: xForecasts, y:computeTrend(outputs.ETcropCumulative, 25), mode:'line', line: {color: "rgb(255, 23, 68)", dash: 'dot'}, name: "Lower Bound", showlegend: false};
+    let ETcropCumulative50 = {x: xForecasts, y:computeTrend(outputs.ETcropCumulative, 50), mode:'line', line: {color: "rgb(255, 23, 68)"}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Median ETcrop"};
+    let ETcropCumulative75 = {x: xForecasts, y:computeTrend(outputs.ETcropCumulative, 75), mode:'line', line: {color: "rgb(255, 23, 68)", dash: 'dot'}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Upper Bound", showlegend: false};
+    stats.ETcropCumulative = [ETcropCumulative25, ETcropCumulative50, ETcropCumulative75];
+
+    // ETref Cumulative
+    let ETrefCumulative25 = {x: xForecasts, y:computeTrend(outputs.ETrefCumulative, 25), mode:'line', line: {color: "rgb(219, 6, 226)", dash: 'dot'}, name: "Lower Bound", showlegend: false};
+    let ETrefCumulative50 = {x: xForecasts, y:computeTrend(outputs.ETrefCumulative, 50), mode:'line', line: {color: "rgb(219, 6, 226)"}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Median ETref"};
+    let ETrefCumulative75 = {x: xForecasts, y:computeTrend(outputs.ETrefCumulative, 75), mode:'line', line: {color: "rgb(219, 6, 226)", dash: 'dot'}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Upper Bound", showlegend: false};
+    stats.ETrefCumulative = [ETrefCumulative25, ETrefCumulative50, ETrefCumulative75];
+
+    // Precip Cumulative
+    let precipCumulative25 = {x: xForecasts, y:computeTrend(outputs.precipCumulative, 25), mode:'line', line: {color: "rgb(68, 23, 225)", dash: 'dot'}, name: "Lower Bound"};
+    let precipCumulative50 = {x: xForecasts, y:computeTrend(outputs.precipCumulative, 50), mode:'line', line: {color: "rgb(68, 23, 225)"}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Median Precipitation"};
+    let precipCumulative75 = {x: xForecasts, y:computeTrend(outputs.precipCumulative, 75), mode:'line', line: {color: "rgb(68, 23, 225)", dash: 'dot'}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Upper Bound"};
+    stats.precipCumulative = [precipCumulative25, precipCumulative50, precipCumulative75];
+
+    // Thermal Units Cumulative
+    let thermalUnitsCumulative25 = {x: xForecasts, y:computeTrend(outputs.thermalUnitsCumulative, 25), mode:'line', line: {color: "rgb(230, 81, 0)", dash: 'dot'}, name: "Lower Bound"};
+    let thermalUnitsCumulative50 = {x: xForecasts, y:computeTrend(outputs.thermalUnitsCumulative, 50), mode:'line', line: {color: "rgb(230, 81, 0)"}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Median Thermal Units"};
+    let thermalUnitsCumulative75 = {x: xForecasts, y:computeTrend(outputs.thermalUnitsCumulative, 75), mode:'line', line: {color: "rgb(230, 81, 0)", dash: 'dot'}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Upper Bound"};
+    stats.thermalUnitsCumulative = [thermalUnitsCumulative25, thermalUnitsCumulative50, thermalUnitsCumulative75];
+
+    // Evaporation Cumulative
+    let evaporationCumulative25 = {x: xForecasts, y:computeTrend(outputs.evaporationCumulative, 25), mode:'line', line: {color: "rgb(255, 23, 68)", dash: 'dot'}, name: "Lower Bound", showlegend: false};
+    let evaporationCumulative50 = {x: xForecasts, y:computeTrend(outputs.evaporationCumulative, 50), mode:'line', line: {color: "rgb(255, 23, 68)"}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Median Evaporation"};
+    let evaporationCumulative75 = {x: xForecasts, y:computeTrend(outputs.evaporationCumulative, 75), mode:'line', line: {color: "rgb(255, 23, 68)", dash: 'dot'}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Upper Bound", showlegend: false};
+    stats.evaporationCumulative = [evaporationCumulative25, evaporationCumulative50, evaporationCumulative75];
+
+    // Transpiration Cumulative
+    let transpirationCumulative25 = {x: xForecasts, y:computeTrend(outputs.transpirationCumulative, 25), mode:'line', line: {color: "rgb(0, 150, 0)", dash: 'dot'}, name: "Lower Bound", showlegend: false};
+    let transpirationCumulative50 = {x: xForecasts, y:computeTrend(outputs.transpirationCumulative, 50), mode:'line', line: {color: "rgb(0, 150, 0)"}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Median Transpiration"};
+    let transpirationCumulative75 = {x: xForecasts, y:computeTrend(outputs.transpirationCumulative, 75), mode:'line', line: {color: "rgb(0, 150, 0)", dash: 'dot'}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Upper Bound", showlegend: false};
+    stats.transpirationCumulative = [transpirationCumulative25, transpirationCumulative50, transpirationCumulative75];
+
+    // Yield Cumulative Probability
+    stats.grainYieldCumulativeProbability = [grainYieldCumulativeProbability];
+}
+
+function updatePlots(){
     config = {modeBarButtonsToRemove: ['hoverCompareCartesian', 'lasso2d'], responsive: true};
-    Plotly.newPlot('plotSoilWater', outputs.soilWater, { yaxis: {title: "Rootzone Soil Water (mm)"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
-    Plotly.newPlot('plotPrecipCumulative', outputs.precipCumulative, { yaxis: {title: "Cumulative Precipitation (mm)"}, autosize: true, showlegend: false, margin: {l:80, r:20, t:10, b:80}  }, config);
-    Plotly.newPlot('plotETcropCumulative', outputs.ETcropCumulative, { yaxis: {title: "Cumulative ET (mm)"}, autosize: true, showlegend: true, margin: {l:80, r:20, t:10, b:80}, legend: {x: 1, xanchor: 'right', y: 1.1, orientation:"h"}, hovermode:'closest' }, config);
-    Plotly.newPlot('plotGrainYield', [{x:yieldXProb, y:yieldYProb, mode:'line'}], { yaxis: {title: "Cumulative Probability"}, xaxis:{title:'Grain Yield (Mg/ha)'}, autosize: true, showlegend: false, margin: {l:80, r:20, t:10, b:80}, hovermode:'closest' }, config);
-    //Plotly.newPlot('plotGrainYield', [{x:outputs.grainYield,type:'histogram', histnorm:'probability'}], { xaxis: {title: "Estimated Grain Yield (Mg/ha)"}, yaxis: {title: "Probability"}, autosize: true, showlegend: false, margin: {l:80, r:20, t:10, b:80}  }, config),
-    Plotly.newPlot('plotCanopyCover', outputs.canopyCover, { yaxis: {title: "Canopy Cover"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80}  }, config);
-    Plotly.newPlot('plotThermalUnits', outputs.thermalUnitsCumulative, { yaxis: {title: "Thermal Units (C-day)"}, autosize: true, showlegend: false, margin: {l:80, r:20, t:10, b:80}  }, config);
-    Plotly.newPlot('plotSoilWaterDeficit', outputs.soilWaterDeficit, { yaxis: {title: "Soil Water Deficit (mm)"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
-    Plotly.newPlot('plotETPartitionCumulative', outputs.evaporationCumulative, { yaxis: {title: "ET components (mm)"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
 
-    let xForecasts = outputs.soilWater[0].x; // Simplified solution to generate a range of x values in the current time varaible
-    let medianSoilWater = {x: xForecasts, y:computeTrend(outputs.soilWater), mode:'line', line: {color: "rgb(255, 23, 68)"}, name: "Median Soil Water"};
-    Plotly.addTraces('plotSoilWater', medianSoilWater);
+    Plotly.react('plotSoilWater', stats.soilWater, { yaxis: {title: "Rootzone Soil Water (mm)"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
+    Plotly.react('plotSoilWaterDeficit', stats.soilWaterDeficit, { yaxis: {title: "Rootzone Soil Water Deficit (mm)"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
+    Plotly.react('plotCanopyCover', stats.canopyCover, { yaxis: {title: "Fraction Canopy Cover"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
+    Plotly.react('plotETCumulative', stats.ETcropCumulative, { yaxis: {title: "Cumulative ET (mm)"}, autosize: true, showlegend: true, legend: {x: 1, xanchor: 'right', y: 1.1, orientation:"h"}, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
+    Plotly.react('plotPrecipCumulative', stats.precipCumulative, { yaxis: {title: "Cumulative Precipitation (mm)"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
+    Plotly.react('plotThermalUnitsCumulative', stats.thermalUnitsCumulative, { yaxis: {title: "Thermal Units (C-day)"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
+    Plotly.react('plotETPartitionCumulative', stats.evaporationCumulative, { yaxis: {title: "ET components (mm)"}, autosize: true, showlegend: true, legend: {x: 1, xanchor: 'right', y: 1.1, orientation:"h"}, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
+    Plotly.react('plotGrainYield', stats.grainYieldCumulativeProbability, { yaxis: {title: "1 - Cumulative Probability"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
+    
+    Plotly.addTraces('plotETCumulative', stats.ETrefCumulative);
+    Plotly.addTraces('plotETPartitionCumulative', stats.transpirationCumulative);
 
-    let medianSoilWaterDeficit = {x: xForecasts, y:computeTrend(outputs.soilWaterDeficit), mode:'line', line: {color: "rgb(255, 23, 68)"}, name: "Median Soil Water Deficit"};
-    Plotly.addTraces('plotSoilWaterDeficit', medianSoilWaterDeficit);
-
-    let medianCanopyCover = {x:xForecasts, y:computeTrend(outputs.canopyCover), mode:'line', line: {color: "rgb(25, 255, 68)"}, name: "Median Canopy Cover"};
-    Plotly.addTraces('plotCanopyCover', medianCanopyCover);
-
-    let medianETcropCumulative = {x:xForecasts, y:computeTrend(outputs.ETcropCumulative), mode:'line', line: {color: "rgb(255, 23, 68)"}, name: "Median ETcrop"};
-    Plotly.addTraces('plotETcropCumulative', medianETcropCumulative);
-
-    let medianETrefCumulative = {x:xForecasts, y:computeTrend(outputs.ETrefCumulative), mode:'line', line: {color: "rgb(255, 23, 68)", dash: 'dot'}, name: "Median ETref"};
-    Plotly.addTraces('plotETcropCumulative', outputs.ETrefCumulative);
-    Plotly.addTraces('plotETcropCumulative', medianETrefCumulative);
-
-    let medianPrecipCumulative = {x:xForecasts, y:computeTrend(outputs.precipCumulative), mode:'line', line: {color: "rgb(68, 23, 225)"}, name: "Median Cumualtive Precipitation"};
-    Plotly.addTraces('plotPrecipCumulative', medianPrecipCumulative);
-
-    let medianThermalUnits = {x:xForecasts, y:computeTrend(outputs.thermalUnitsCumulative), mode:'line', line: {color: "rgb(230, 81, 0)"}, name: "Median Thermal Units"};
-    Plotly.addTraces('plotThermalUnits', medianThermalUnits);
-
-    let medianEvaporationCumulative = {x: xForecasts, y:computeTrend(outputs.evaporationCumulative), mode:'line', line: {color: "rgb(255, 23, 68)"}, name: "Median Cumulative Evaporation"};
-    Plotly.addTraces('plotETPartitionCumulative', medianEvaporationCumulative);
-
-    let medianTranspirationCumulative = {x: xForecasts, y:computeTrend(outputs.transpirationCumulative), mode:'line', line: {color: "rgb(25, 255, 68)"}, name: "Median Cumulative Transpiration"};
-    Plotly.addTraces('plotETPartitionCumulative', outputs.transpirationCumulative);
-    Plotly.addTraces('plotETPartitionCumulative', medianTranspirationCumulative);
+    if(visualizeScenarios.checked){
+        let N = [...Array(outputs.soilWater.length).keys()];
+        Plotly.addTraces('plotSoilWater', outputs.soilWater, N);
+        Plotly.addTraces('plotSoilWaterDeficit', outputs.soilWaterDeficit, N);
+        Plotly.addTraces('plotCanopyCover', outputs.canopyCover, N);
+        Plotly.addTraces('plotETCumulative', outputs.ETcropCumulative, N);
+        Plotly.addTraces('plotETCumulative', outputs.ETrefCumulative, N);
+        Plotly.addTraces('plotPrecipCumulative', outputs.precipCumulative, N);
+        Plotly.addTraces('plotThermalUnitsCumulative', outputs.thermalUnitsCumulative, N);
+        Plotly.addTraces('plotETPartitionCumulative', outputs.evaporationCumulative, N);
+        Plotly.addTraces('plotETPartitionCumulative', outputs.transpirationCumulative, N);
+    }
 }
 
 
 function addFieldObservationsToPlot(){
-    let soilWaterObs = {x:[], y:[], mode:'markers'};
-    for(let i=0; i<weather.length; i++){
-        if(!isNaN(weather[i].rootzoneSoilWaterObs)){
-            soilWaterObs.x.push( formatDatePlotly(weather[i].date.getTime())); 
-            soilWaterObs.y.push(weather[i].rootzoneSoilWaterObs); 
+    let soilWaterObs = {x:[], y:[], mode:'markers', name:'Observation'};
+    for(let i=0; i<observations.length; i++){
+        if(typeof observations[i].rootzoneSoilWaterObs === 'number'){
+            soilWaterObs.x.push( formatDatePlotly(observations[i].date)); 
+            soilWaterObs.y.push(observations[i].rootzoneSoilWaterObs); 
         }
     }
     Plotly.addTraces('plotSoilWater', soilWaterObs);
 
-    let canopyCoverObs = {x:[], y:[], mode:'markers'};
-    for(let i=0; i<weather.length; i++){
-        if(!isNaN(weather[i].canopyCoverObs)){
-            canopyCoverObs.x.push( formatDatePlotly(weather[i].date.getTime())); 
-            canopyCoverObs.y.push(weather[i].canopyCoverObs/100); 
+    let canopyCoverObs = {x:[], y:[], mode:'markers', name:'Observation', marker: {color: "rgb(0, 150, 0)"} };
+    for(let i=0; i<observations.length; i++){
+        if(typeof observations[i].canopyCoverObs === 'number'){
+            canopyCoverObs.x.push( formatDatePlotly(observations[i].date)); 
+            canopyCoverObs.y.push(observations[i].canopyCoverObs/100); 
         }
     }
     Plotly.addTraces('plotCanopyCover', canopyCoverObs)
 }
 
-
-///// DOWNLOAD DATA BUTTON /////
-function setDownloadRawOutputs(){
-    let data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(outputs));
-    let downloadDataBtn = document.getElementById('downloadDataBtn');
-    downloadDataBtn.style.display = 'block'
-    downloadDataBtn.download = 'data.json';
-    downloadDataBtn.href = 'data:' + data;
-    xAxisVariableMenu.parentElement.parentElement.parentElement.style.display = 'block';
-}
 
 
 ///// HELPER FUNCTIONS /////
@@ -824,14 +959,14 @@ function computeReferenceET(geolocation,atmos,cover='grass') {
 
 
 function getDayOfYear(date) {
-    let januaryFirst = new Date("1-Jan-" + date.getFullYear());
+    let januaryFirst = new Date("1-Jan-" + new Date(date).getFullYear());
     let doy = Math.floor((date - januaryFirst + 86400000)/86400000);
     return doy;
 }
 
 function getKcbCurveValue(time,emg,ini,dev,mid,late,KcbIni,KcbMid,KcbEnd) {
     if(time <= emg){
-        Kcb = 0;
+        Kcb = 0.01;
     } else if(time > emg & time <= ini){
         Kcb = KcbIni;
     } else if (time > ini && time <= dev){
@@ -888,21 +1023,13 @@ function computeThermalUnits(Tavg,Tbase,Tupper){
     return Tavg - Tbase;
 }
 
-function computeMedian(arr){
+function percentile(arr,p){
     arr.sort(function(a, b){return a - b});
-    let L = arr.length;
-    let idx_50 = Math.round(arr.length/2) - 1;
-    if(arr.length === 1){
-        return arr[0];
-    } else if(L % 2 === 1){
-        return arr[idx_50];
-    } else {
-        return (arr[idx_50] + arr[idx_50+1])/2;
-    }
+    let idx = Math.max(Math.round(arr.length*p/100) - 1, 0);
+    return arr[idx];
 }
 
-
-function computeTrend(inputVar){
+function computeTrend(inputVar,p){
     let summaryStat = [];
     for (let i = 0; i < inputVar[0].y.length; i++){
       let iterVec = [];
@@ -911,7 +1038,61 @@ function computeTrend(inputVar){
             iterVec.push(inputVar[j].y[i]);
           }
       }
-      summaryStat[i] = computeMedian(iterVec);
+      summaryStat[i] = percentile(iterVec,p);
     }
     return summaryStat;
 }
+
+
+function setSettings(settings){
+    // Plant
+    KcbIniSlider.noUiSlider.set([settings.plant.KcbIni]);
+    KcbMidSlider.noUiSlider.set([settings.plant.KcbMid]);
+    KcbEndSlider.noUiSlider.set([settings.plant.KcbEnd]);
+    baseTempSlider.noUiSlider.set([settings.plant.baseTempeature]);
+    upperTempSlider.noUiSlider.set([settings.plant.upperTempeature]);
+    stagesDurationSlider.noUiSlider.set([settings.plant.emergenceThermalUnits,
+                                         settings.plant.iniThermalUnits,
+                                         settings.plant.devThermalUnits,
+                                         settings.plant.midThermalUnits,
+                                         settings.plant.lateThermalUnits]);
+    pTabSlider.noUiSlider.set([settings.plant.pTab]);
+    plantHeightSlider.noUiSlider.set([settings.plant. plantHeight]);
+    rootDepthSlider.noUiSlider.set([settings.plant.rootDepth]);
+    yieldResponseSlider.noUiSlider.set([settings.plant.yieldResponse]);
+    yieldPotentialSlider.noUiSlider.set([settings.plant.yieldPotential]);
+
+    // Soil
+    readilyEvaporableWaterSlider.noUiSlider.set([settings.soil.readilyEvaporableWater])
+    surfaceDepthSlider.noUiSlider.set([settings.soil.surfaceDepth])
+    residueCoverSlider.noUiSlider.set([settings.soil.residueCover])
+    lowerLimitSlider.noUiSlider.set([settings.soil.lowerLimit])
+    upperLimitSlider.noUiSlider.set([settings.soil.upperLimit])
+    thetaInitialSurfaceSlider.noUiSlider.set([settings.soil.thetaInitialSurface])
+    thetaInitialRootzoneSlider.noUiSlider.set([settings.soil.thetaInitialRootzone])
+    wettedFractionSlider.noUiSlider.set([settings.soil.wettedFraction])
+    curveNumberSlider.noUiSlider.set([settings.soil.curveNumber])
+
+    // Location
+    projectNameElement.innerText = settings.geolocation.name;
+    projectDescriptionElement.innerText = settings.geolocation.description;
+    latitudeElement.innerText = settings.geolocation.latitude;
+    altitudeElement.innerText = settings.geolocation.altitude;
+
+    // Management
+    let startDate = new Date(settings.management.plantingDate).getTime() ;
+    let forecastDate = new Date(settings.management.forecastingDate).getTime();
+    let endDate = new Date(settings.management.endDate).getTime();
+    managementDatesSlider.noUiSlider.updateOptions( {range: {'min': startDate, 'max': endDate} }); // Update the range of the date slider       
+    managementDatesSlider.noUiSlider.set([startDate,forecastDate]);
+
+    // Options
+    visualizeScenarios.checked = settings.options.visualizeScenarios;
+    assimilateCanopyCoverObservations.checked = settings.options.assimilateCanopyCoverObservations;
+    assimilateSoilMoistureObservations.checked = settings.options.assimilateSoilMoistureObservations; 
+    constantRootDepth.checked = settings.options.constantRootDepth;
+    constantPlantHeight.checked = settings.options.constantPlantHeight; 
+
+}
+
+

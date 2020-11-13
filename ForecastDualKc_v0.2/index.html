@@ -17,72 +17,50 @@
     <title>ForecastDualKc</title>
 
     <!-- Compiled and minified CSS -->
-    <link rel="stylesheet" href="ForecastDualKc_v0.3/libs/materializecss.min.css">
+    <link rel="stylesheet" href="libs/materializecss.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="ForecastDualKc_v0.3/css/custom.css">
-    <link rel="stylesheet" href="ForecastDualKc_v0.3/libs/nouislider.min.css">
+    <link rel="stylesheet" href="css/custom.css">
+    <link rel="stylesheet" href="libs/nouislider.min.css">
 
 </head>
 
 
 <body>
-
     <nav class="navbar z-depth-0 white" style="margin-top: 10px;">
         <div class="nav-wrapper">
             <a href="#" class="brand-logo" style="font-size: 3rem; padding-left: 20px; color: rgb(104, 0, 201); font-weight: 600;">ForecastDualKc</a>
             <ul id="nav-mobile" class="right hide-on-med-and-down">
-            <li><a href="ForecastDualKc_v0.3/docs/documentation.html" target="_blank" class="deep-purple-text text-darken-2">Docs</a></li>
+            <li><a href="docs/documentation.html" target="_blank" class="deep-purple-text text-darken-2">Docs</a></li>
             <li><a href="https://github.com/soilwaterksu/forecastdualkc" class="deep-purple-text text-darken-2">Github</a></li>
+            <li><a href="" class="deep-purple-text text-darken-2" id="downloadDataBtn" style="display: none;">Download Results</a></li>
             </ul>
         </div>
     </nav>
-
     <div class="divider"></div>
 
+
+    
     <ul id="slide-out" class="sidenav sidenav-fixed custom-sidenav" >
 
         <div class="model-controls">
 
             <!-- LOCATION CONTROLS -->
             <h6 class="orange-text text-darken-" style="padding-left: 0px;"><b>Location</b></h6>
-
             <div class="row">
                 <div class="input-field col s12 m12 l6 xl6">
-                    <input value="example_field" id="projectName" type="text" class="validate">
-                    <div>Name</div>
-                </div>
-                <div class="input-field col s12 m12 l3 xl3">
                     <input value="39.1" id="latitude" type="number" class="validate" min="-90" max="90" step="0.1">
                     <div>Latitude</div>
                 </div>
-                <div class="input-field col s12 m12 l3 xl3">
+                <div class="input-field col s12 m12 l6 xl6">
                     <input value="300" id="altitude" type="number" class="validate" min="-100" max="8000" step="1">
                     <div>Altitude (m)</div>
                 </div>
-            </div>
-            <div class="row">
-                <ul class="collapsible">
-                    <li>
-                        <div class="collapsible-header" style="padding:0px !important;"><i class="material-icons">short_text</i>
-                            Description
-                        </div>
-                        <div class="collapsible-body">
-                            <form class="col s12">
-                                <div class="row">
-                                <div class="input-field col s12">
-                                    <textarea id="projectDescription" class="materialize-textarea" rows="5"></textarea>
-                                </div>
-                                </div>
-                            </form>
-                        </div>
-                    </li>
-                </ul>
             </div>
 
             <!-- ATMOSPHERE CONTROLS -->
             <h6 class="blue-text text-darken-2"><b>Atmosphere</b></h6>
             <div class="file-field input-field">
-                <div class="btn-small white black-text tooltipped" data-position="top" data-tooltip="File with historical data for the region.">
+                <div class="btn white black-text tooltipped" data-position="top" data-tooltip="File with historical data for the region.">
                     <span>Climate Data &nbsp;</span>
                     <input type="file" id="climateInput">
                 </div>
@@ -92,12 +70,12 @@
             </div>
 
             <div class="file-field input-field">
-                <div class="btn-small white black-text tooltipped"  data-position="top" data-tooltip="File with observations for the current growing season.">
+                <div class="btn white black-text tooltipped" data-position="top" data-tooltip="File with observations for the current growing season.">
                     <span>OBSERVATIONS</span>
-                    <input type="file" id="observationsInput" disabled>
+                    <input type="file" id="weatherInput">
                 </div>
                 <div class="file-path-wrapper">
-                    <input class="file-path validate" type="text" id="observationsFileName">
+                    <input class="file-path validate" type="text" id="weatherFileName">
                 </div>
             </div>
 
@@ -111,6 +89,19 @@
 
             <!-- SOIL CONTROLS -->
             <h6 class="brown-text text-darken-1"><b>Soil</b></h6>
+            <!-- 
+            <div class="row">
+                <div class="input-field col s12 m12 l12 xl12">
+                    <select class id="soilMenu">
+                        <option value="" disabled selected>Choose your soil</option>
+                        <option value="sandyLoam">Sandy Loam</option>
+                        <option value="siltLoam">Silt Loam</option>
+                        <option value="clayLoam">Clay Loam</option>
+                    </select>
+                </div>
+            </div>
+            -->
+
             <div class="row">
                 <div class="col s12 m12 l6 xl6">
                     <div id="surfaceDepth" class="custom-slider tooltipped"  data-position="top" data-tooltip="Depth of evaporation layer. Typically 0.1 to 0.2 m."></div>
@@ -165,7 +156,20 @@
 
 
             <!-- PLANT CONTROLS -->
-            <h6 class="green-text text-darken-2 col s12"><b>Plant</b></h6>          
+            <h6 class="green-text text-darken-2 col s12"><b>Plant</b></h6>
+            <!-- 
+            <div class="row">
+                <div class="input-field col s12 m12 l12 xl12">
+                    <select id="plantMenu">
+                        <option value="" disabled selected>Choose your crop</option>
+                        <option value="winterWheat">Winter wheat</option>
+                        <option value="corn">Corn</option>
+                        <option value="soybeans">Soybeans</option>
+                    </select>
+                </div>
+            </div>
+            -->
+           
             <div class="row">
                 <div class="col s12 m12 l12 xl12">
                     <div>Crop stages</div>
@@ -231,17 +235,9 @@
                 </div>
             </div>
 
-            <div class="divider"></div>
 
             <!-- OTHER OPTIONS -->
             <h6 class="grey-text text-darken-2 col s12"><b>Options</b></h6>
-            <div class="row">
-                <div class="col s12 m12 l12 xl12">
-                    <label>
-                        <input type="checkbox" id="visualizeScenarios"/><span>Visualize all scenarios</span>
-                    </label>
-                </div>
-            </div>
             <div class="row">
                 <div class="col s12 m12 l12 xl12">
                     <label>
@@ -278,47 +274,9 @@
                         <option value="daysAfterPlanting">Days after planting</option>
                         <option value="thermalUnits">Thermal units</option>
                     </select>
-                    <div>X axis scale</div>
                 </div>
             </div>
-
-            <div class="divider"></div>
-
-            <h6 class="grey-text text-darken-2 col s12"><b>Export</b></h6>
-            <p class="grey-text">Use this option to share, store, or further analyze FDK projects. Selecting "Settings" + "Inputs" will make your project fully reproducible by anyone.</p>
-            <div class="row">
-                <div class="col sm12 m12 l6 xl6">
-                    <p>
-                        <label>
-                            <input id="exportSettingsBox" type="checkbox" class="filled-in" checked="checked" />
-                            <span>Settings</span>
-                        </label>
-                    </p>
-                    <p>
-                        <label>
-                            <input id="exportInputsBox" type="checkbox" class="filled-in" checked="checked" />
-                            <span>Inputs</span>
-                        </label>
-                    </p>
-                    <p>
-                        <label>
-                            <input id="exportOutputsBox" type="checkbox" class="filled-in" />
-                            <span>Outputs</span>
-                        </label>
-                    </p>
-                    <a id="exportBtn" href="" class="btn btn-small purple darken-3"><i class="material-icons left">file_download</i>Export data</a>                
-                </div>
-            </div>
-
-            <div class="divider"></div>
-
-            <h6 class="grey-text text-darken-2 col s12"><b>Import</b></h6>
-            <p class="grey-text">Use this option to load FDK projects. If your file only contains model settings, you first need to load climate and observations. </p>
-            <div class="row">
-                <div class="col sm12 m12 l6 xl6">
-                    <span class="btn btn-file btn-small purple darken-1"><i class="material-icons left">file_upload</i>Import data<input id="importBtn" type="file"></span>
-                </div>
-            </div>
+            
         </div>
     </ul>
     <a href="#" data-target="slide-out" class="sidenav-trigger"><i class="material-icons">menu</i></a>
@@ -327,11 +285,9 @@
     <!-- PLOTS -->
     <main>
         <div id="landing" style="padding:15vw; height: 85vh;">
-            <p class="grey-text center-align" style="font-size: 1.2rem;">Press  <a id="loadExampleDatasetBtn" class="btn waves-effect deep-purple darken-2">Play</a> to load some data and start using ForecastDualKc.
-                You can also generate your own climate and observation files. Use this <a class="btn waves-effect deep-purple darken-3" href="ForecastDualKc_v0.3/dataset/dataset.zip" download="example_dataset.zip">Example dataset</a> to get started.</p>
-        <div class="center-align">
-               
-               
+            <p class="grey-text center-align" style="font-size: 1.2rem;">Load some climate data and current meteorological observations to start using ForecastDualKc. You can also download an example dataset to start generating foreacasts.</p>
+            <div class="center-align">
+                <a class="btn waves-effect deep-purple darken-2" href="dataset/dataset.zip" download="example_dataset.zip">Download example dataset</a>
             </div>
         </div>
 
@@ -347,7 +303,7 @@
             </div>
             <div class="row">
                 <div class="col s12 m12 l12 xl6">
-                    <div id="plotETCumulative" class="myplot"></div>
+                    <div id="plotETcropCumulative" class="myplot"></div>
                 </div>
                 <div class="col s12 m12 l12 xl6">
                     <div id="plotPrecipCumulative" class="myplot"></div>
@@ -358,7 +314,7 @@
                     <div id="plotCanopyCover" class="myplot"></div>
                 </div>
                 <div class="col s12 m12 l12 xl6">
-                    <div id="plotThermalUnitsCumulative" class="myplot"></div>
+                    <div id="plotThermalUnits" class="myplot"></div>
                 </div>
             </div>
             <div class="row">
@@ -391,11 +347,11 @@
     </div>
 
 
-    <script src="ForecastDualKc_v0.3/libs/materialize.min.js"></script>
-    <script src="ForecastDualKc_v0.3/libs/plotly_cartesian.min.js"></script>
-    <script src="ForecastDualKc_v0.3/libs/nouislider.min.js"></script>
-    <script src="ForecastDualKc_v0.3/libs/wNumb.min.js"></script>
-    <script src="ForecastDualKc_v0.3/js/ForecastDualKc_v0.3.js"></script>
+    <script src="libs/materialize.min.js"></script>
+    <script src="libs/plotly_cartesian.min.js"></script>
+    <script src="libs/nouislider.min.js"></script>
+    <script src="libs/wNumb.min.js"></script>
+    <script src="js/ForecastDualKc_v0.2.js"></script>
 
 </body>
 </html>
