@@ -1173,12 +1173,12 @@ body{ margin-left:20vw; margin-right:20vw; font-size: 1.2rem; } .katex { font-si
 </blockquote>
 <pre><code>Headers of observations (order matters)
 
-year | month | day| tempMax | tempMin |rhMax | rhMin | precip | solarRad | windSpeed | surfaceSoilMoistureObs | rootzoneSoilMoistureObs | canopyCoverObs
+year | month | day| tempMax | tempMin |rhMax | rhMin | solarRad | windSpeed | precip | surfaceSoilMoistureObs | rootzoneSoilMoistureObs | canopyCoverObs
 </code></pre>
 <p><code>Climate</code> refers to long-term (&gt;10 years) of weather data used for the forecasting component from the present time to an estiamted end of the growing season based on thermal units. Climate records do not necessarily need to be for the field under simulation. Climate records from an environmental monitoring station in the county or agrciultural climate division should provide enough information about plausible scenarios. Even stations at about 75 km (~50 miles) should provide valuable data.</p>
 <pre><code>Headers of climate file (order matters)
 
-year | month | day| tempMax | tempMin |rhMax | rhMin | precip | solarRad | windSpeed
+year | month | day| tempMax | tempMin |rhMax | rhMin | solarRad | windSpeed | precip | irrigation |
 </code></pre>
 <h4 id="table-of-atmospheric-variables">Table of atmospheric variables</h4>
 <table>
@@ -1226,11 +1226,6 @@ year | month | day| tempMax | tempMin |rhMax | rhMin | precip | solarRad | windS
 <td style="text-align:left">Minimum daily relative humidity</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>precip</code></td>
-<td style="text-align:center">mm</td>
-<td style="text-align:left">Daily total precipitation</td>
-</tr>
-<tr>
 <td style="text-align:left"><code>solarRad</code></td>
 <td style="text-align:center">MJ/<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>m</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">m^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord mathdefault">m</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span>/day</td>
 <td style="text-align:left">Incident solar radiation</td>
@@ -1239,6 +1234,16 @@ year | month | day| tempMax | tempMin |rhMax | rhMin | precip | solarRad | windS
 <td style="text-align:left"><code>windSpeed</code></td>
 <td style="text-align:center">m/s</td>
 <td style="text-align:left">Daily average wind speed</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>precip</code></td>
+<td style="text-align:center">mm</td>
+<td style="text-align:left">Daily total precipitation</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>irrigation</code></td>
+<td style="text-align:center">mm</td>
+<td style="text-align:left">Daily total irrigation</td>
 </tr>
 </tbody>
 </table>

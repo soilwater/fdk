@@ -111,13 +111,13 @@ Atmospheric observations are required in two diferent model inputs: `Climate` an
 
     Headers of observations (order matters)
     
-    year | month | day| tempMax | tempMin |rhMax | rhMin | precip | solarRad | windSpeed | surfaceSoilMoistureObs | rootzoneSoilMoistureObs | canopyCoverObs
+    year | month | day| tempMax | tempMin |rhMax | rhMin | solarRad | windSpeed | precip | surfaceSoilMoistureObs | rootzoneSoilMoistureObs | canopyCoverObs
 
 `Climate` refers to long-term (>10 years) of weather data used for the forecasting component from the present time to an estiamted end of the growing season based on thermal units. Climate records do not necessarily need to be for the field under simulation. Climate records from an environmental monitoring station in the county or agrciultural climate division should provide enough information about plausible scenarios. Even stations at about 75 km (~50 miles) should provide valuable data.
 
     Headers of climate file (order matters)
     
-    year | month | day| tempMax | tempMin |rhMax | rhMin | precip | solarRad | windSpeed
+    year | month | day| tempMax | tempMin |rhMax | rhMin | solarRad | windSpeed | precip | irrigation |
 
 #### Table of atmospheric variables
 
@@ -130,9 +130,11 @@ Variable|Units|Description
 `tempMin`|Celsius|Minimum daily air temperature
 `rhMax`|%| Maximum daily relative humidity
 `rhMin`|%| Minimum daily relative humidity
-`precip`|mm| Daily total precipitation
 `solarRad`| MJ/$m^2$/day| Incident solar radiation
 `windSpeed`|m/s| Daily average wind speed
+`precip`|mm| Daily total precipitation
+`irrigation`|mm| Daily total irrigation
+
 
 #### Table of field observations
 

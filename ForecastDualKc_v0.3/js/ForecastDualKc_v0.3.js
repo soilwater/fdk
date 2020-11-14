@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     M.Sidenav.init(document.querySelectorAll('.sidenav'));
     M.Tooltip.init(document.querySelectorAll('.tooltipped'));
     M.Collapsible.init(document.querySelectorAll('.collapsible'));
-  
+
     // Disable all sliders on page load to prevent simualtions with no data
     document.querySelectorAll('.custom-slider').forEach(item => {
         item.setAttribute('disabled', true)
@@ -374,7 +374,8 @@ function readClimate (){
                 climate.push( { year:parseInt(values[0]), month:parseInt(values[1]), day:parseInt(values[2]), 
                     tempMax:parseFloat(values[3]), tempMin:parseFloat(values[4]), 
                     rhMax:parseFloat(values[5]), rhMin:parseFloat(values[6]),
-                    precip:parseFloat(values[7]), solarRad:parseFloat(values[8]), windSpeed:parseFloat(values[9])} );
+                    solarRad:parseFloat(values[7]), windSpeed:parseFloat(values[8]),
+                    precip:parseFloat(values[9])} );
             }
         };
         for(let i=0; i<climate.length; i++){ climate[i].tempAvg = Math.round( (climate[i].tempMax + climate[i].tempMin)/2 * 100)/100 }
@@ -412,8 +413,8 @@ function readObservations (){
                 observations.push( { year:parseInt(values[0]), month:parseInt(values[1]), day:parseInt(values[2]), 
                                 tempMax:parseFloat(values[3]), tempMin:parseFloat(values[4]), 
                                 rhMax:parseFloat(values[5]), rhMin:parseFloat(values[6]),
-                                precip:parseFloat(values[7]), solarRad:parseFloat(values[8]), windSpeed:parseFloat(values[9]),
-                                irrigation: parseFloat(values[10]), surfaceSoilWaterObs:parseFloat(values[11]), 
+                                solarRad:parseFloat(values[7]), windSpeed:parseFloat(values[8]),
+                                precip:parseFloat(values[9]), irrigation: parseFloat(values[10]), surfaceSoilWaterObs:parseFloat(values[11]), 
                                 rootzoneSoilWaterObs:parseFloat(values[12]), canopyCoverObs:parseFloat(values[13]) } )
             }
         }
