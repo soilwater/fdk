@@ -865,13 +865,13 @@ function updatePlots(){
     Plotly.react('plotPrecipCumulative', stats.precipCumulative, { yaxis: {title: "Cumulative Precipitation (mm)"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
     Plotly.react('plotThermalUnitsCumulative', stats.thermalUnitsCumulative, { yaxis: {title: "Thermal Units (C-day)"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
     Plotly.react('plotETPartitionCumulative', stats.evaporationCumulative, { yaxis: {title: "ET components (mm)"}, autosize: true, showlegend: true, legend: {x: 1, xanchor: 'right', y: 1.1, orientation:"h"}, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
-    Plotly.react('plotGrainYield', stats.grainYieldCumulativeProbability, { yaxis: {title: "1 - Cumulative Probability"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
+    Plotly.react('plotGrainYield', stats.grainYieldCumulativeProbability, { xaxis: {title: "Estimated Grain Yield (Mg/ha)"}, yaxis: {title: "1 - Cumulative Probability"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
     
     Plotly.addTraces('plotETCumulative', stats.ETrefCumulative);
     Plotly.addTraces('plotETPartitionCumulative', stats.transpirationCumulative);
 
     if(visualizeScenarios.checked){
-        let N = [...Array(outputs.soilWater.length).keys()];
+        let N = [...Array(outputs.soilWater.length).keys()]; // generate values from 0 to N-1 using new notation
         Plotly.addTraces('plotSoilWater', outputs.soilWater, N);
         Plotly.addTraces('plotSoilWaterDeficit', outputs.soilWaterDeficit, N);
         Plotly.addTraces('plotCanopyCover', outputs.canopyCover, N);
