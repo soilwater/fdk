@@ -577,7 +577,6 @@ function model(){
             let Kr;
             let KcMax;
             let RAW;
-            let Zmin;
             let depletionOfNewRootLength;
             let grainYield;
             let simulationDate;
@@ -586,7 +585,6 @@ function model(){
             TEW = 1000 * (soil.upperLimit - 0.5*soil.lowerLimit) * soil.surfaceDepth; // Eq. 73, FAO-56 total evaporable water (Renamed TEW for potential)
             TEW = TEW - TEW * soil.residueCover/100 * (0.05/0.1); // Reduce TEW by 5% for every 10% residue cover (See Chapter 11: Surface covered by dead vegetation)
             REW = soil.readilyEvaporableWater*TEW; // REW is limited to be less than or equal to TEW
-            Zmin = 0.3; // Minimum length of the rootzone.
 
             while (inGrowingSeason){
                 if(n < management.plantingToForecast){
@@ -621,7 +619,7 @@ function model(){
                 if (n == 0){
                     thermalUnits = computeThermalUnits(tempAvg, plant.baseTempeature, plant.upperTempeature); 
                     thermalUnitsCumulative[n] = thermalUnits;
-                    if(options.constantRootDepth){ Z[n] = plant.rootDepth; } else { Z[n] = Zmin; }
+                    if(options.constantRootDepth){ Z[n] = plant.rootDepth; } else { Z[n] = 0; }
                     if(options.constantPlantHeight){ h[n] = plant.plantHeight; } else { h[n] = 0; }
                     if(precip > 0) { RO[n] = computeRunoff(precip, soil.curveNumber) } else { RO[n] = 0}; // Runoff based on the curve number method
                     De[n] = 1000 * (soil.upperLimit - soil.thetaInitialSurface) * soil.surfaceDepth; // initial depletion of surface layer
