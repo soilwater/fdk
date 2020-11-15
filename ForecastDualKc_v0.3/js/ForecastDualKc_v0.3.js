@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
 let climateInputElement = document.getElementById("climateInput");
 climateInputElement.addEventListener('change', function (){
     try{
+        climate = []; // Reset array
         readClimate()
     } catch(err){
         document.getElementById("errorModalMsg").innerText = err.message;
@@ -31,6 +32,7 @@ climateInputElement.addEventListener('change', function (){
 let observationsInputElement = document.getElementById("observationsInput");
 observationsInputElement.addEventListener('change', function(){
     try{
+        observations = []; // Reset array
         readObservations()
     } catch(err){
         document.getElementById("errorModalMsg").innerText = err.message;
@@ -168,7 +170,7 @@ let iniSliderValue = document.getElementById('iniSliderValue');
 let devSliderValue = document.getElementById('devSliderValue');
 let midSliderValue = document.getElementById('midSliderValue');
 let lateSliderValue = document.getElementById('lateSliderValue');
-noUiSlider.create(stagesDurationSlider, { start:[150, 1000, 1400, 2000, 2400], connect:[true, true, true, true, true, false], range:{'min':0, 'max':2800}, step: 10, margin: 10, format: wNumb({decimals: 0}) });
+noUiSlider.create(stagesDurationSlider, { start:[150, 1000, 1400, 2000, 2400], connect:[true, true, true, true, true, false], range:{'min':0, 'max':2800}, step: 10, margin: 0, format: wNumb({decimals: 0}) });
 stagesDurationSlider.noUiSlider.on('update', function (values, handle) { 
     if(handle == 0){ 
         emergenceSliderValue.innerHTML = 'Emergence: ' + values[handle] + ' thermal units';
@@ -565,10 +567,11 @@ function model(){
             let precipCumulative = [];
             let ETrefCumulative = [];
             let ETcropCumulative = [];
-            let ETcropCumulativeNoStress = [];
+            let transpirationCumulativeNoStress = [];
             let Kc = [];
             let REW;
             let TEW;
+            let I;
             let few;
             let Kr;
             let KcMax;
@@ -625,9 +628,9 @@ function model(){
                     De[n] = Math.min(De[n], TEW);      // Eq. 78
                     if (De[n] < REW) {Kr = 1} else {Kr = (TEW - De[n])/(TEW - REW)} // Eq. 74, FAO-56, evaporation reduction coefficient
                     DPe[n]= Math.max(0, (precip-RO[n]) + irrigation/soil.wettedFraction - De[n]); // Eq. 79, FAO-56
-                    Kcb[n] = 0.01;
+                    Kcb[n] = 0;
                     KcMax = Math.max((1.2 + [0.04 * (windSpeed - 2) - 0.004*(rhMin-45)] * (h[n]/3)**0.3), Kcb[n] + 0.05); // Eq. 72, FAO-56
-                    fc[n] = 0; // Using a KcMin = 0.15
+                    fc[n] = 0;
                     few = Math.min(1 - fc[n], soil.wettedFraction);
                     Ke[n] = Math.min(Kr * (KcMax - Kcb[n]), few * KcMax); // Eq. 71, FAO-56, soil evaporation coefficient
                     p = plant.pTab + 0.04 * (5 - Kcb[n] * ETref); // Fig. 41, FAO-56
@@ -640,11 +643,11 @@ function model(){
                     //Dr[n]  = Math.max(Dr[n],0);
                     if (Dr[n] < RAW) {Ks[n] = 1} else {Ks[n] = (TAW[n] - Dr[n]) / (TAW[n] - RAW)} // Eq. 84, FAO-56, transpiration reduction factor
                     ETcrop[n] = (Ks[n] * Kcb[n] + Ke[n]) * ETref; // Eq. 80, FAO-56, total crop water use for the day (mm)
-                    DPr[n] = Math.max(0, (precip - RO[n]) + irrigation[n] - ETcrop[n] - Dr[n])*0.5;  // Eq. 88, FAO-56, drainage of water from the bottom of the root zone
+                    DPr[n] = Math.max(0, (precip - RO[n]) + irrigation[n] - ETcrop[n] - Dr[n]);  // Eq. 88, FAO-56, drainage of water from the bottom of the root zone
                     
                     // Additional metrics
-                    E[n] = (Ke[n] + 0.01) * ETref; // Soil evaporation (mm) A value of Kcb = 0.01 is sued to account for diffusive losses Lollato et al., 2016
-                    T[n] = Ks[n] * (Kcb[n]-0.01) * ETref; // Transpiration on first day.
+                    E[n] = Ke[n] * ETref; // Soil evaporation (mm)
+                    T[n] = Ks[n] * Kcb[n] * ETref; // Transpiration on first day.
                     evaporationCumulative[n] = E[n];
                     transpirationCumulative[n] = T[n];
                     soilWater[n] = (soil.upperLimit * Z[n] * 1000) - Dr[n];
@@ -652,7 +655,7 @@ function model(){
                     precipCumulative[n] = precip;
                     ETrefCumulative[n] = ETref;
                     ETcropCumulative[n] = ETcrop[n];
-                    ETcropCumulativeNoStress[n] = (Kcb[n] + Ke[n]) * ETref;
+                    transpirationCumulativeNoStress[n] = Kcb[n] * ETref;
                     Kc[n] = Kcb[n] + Ke[n];
     
                 } else {
@@ -682,7 +685,8 @@ function model(){
                     if (De[n-1] < REW) {
                         Kr = 1
                     } else {
-                        Kr = (TEW - De[n-1])/(TEW - REW); // Eq. 74, FAO-56, evaporation reduction coefficient. Toores and Calera 2010 proposed: Math.min( REW/ETref, 0.15*(TEW - De[n-1])/(TEW - REW) ); 
+                        Kr = (TEW - De[n-1])/(TEW - REW); // Eq. 74, FAO-56, evaporation reduction coefficient. 
+                        //Kr = Math.min( REW/ETref, 0.15*(TEW - De[n-1])/(TEW - REW) ); // Torres and Calera 2010
                     } 
                     Ke[n] = Math.min(few * KcMax, Kr * (KcMax - Kcb[n])); // Eq. 71, FAO-56, soil evaporation coefficient
                     if(precip > 0) { RO[n] = computeRunoff(precip, soil.curveNumber) } else { RO[n] = 0}; // Runoff based on the curve number method
@@ -696,15 +700,15 @@ function model(){
                     RAW = p * TAW[n]; // Eq. 83, FAO-56, readily plant available water capacity (mm)
                     if (Dr[n-1] < RAW) {Ks[n] = 1} else {Ks[n] = (TAW[n] - Dr[n-1]) / (TAW[n] - RAW)} // Eq. 84, FAO-56, transpiration reduction factor
                     ETcrop[n] = (Ks[n] * Kcb[n] + Ke[n]) * ETref; // Eq. 80, FAO-56, total crop water use for the day (mm)
-                    DPr[n] = Math.max((precip - RO[n]) + irrigation[n] - ETcrop[n] - Dr[n-1], 0) *0.5;  // Eq. 88, FAO-56, drainage of water from the bottom of the root zone
+                    DPr[n] = Math.max((precip - RO[n]) + irrigation[n] - ETcrop[n] - Dr[n-1], 0);  // Eq. 88, FAO-56, drainage of water from the bottom of the root zone
                     depletionOfNewRootLength = 1000 * (soil.upperLimit - (soil.upperLimit + soil.lowerLimit)/2 ) * (Z[n] - Z[n-1]); // Estimate additional deficit of new root length. See Box 5 in Example 38
                     Dr[n] = Dr[n-1] - (precip - RO[n]) - irrigation[n] + ETcrop[n] + DPr[n] + depletionOfNewRootLength;// Eq. 85, FAO-56, root zone depletion at the end of the day
                     //Dr[n] = Math.max(Dr[n], 0); // Eq. 85, FAO-56
                     Dr[n] = Math.min(Dr[n], TAW[n]); // Eq. 86, FAO-56
 
                     // Additional metrics
-                    E[n] = (Ke[n] + 0.01) * ETref; // Soil evaporation (mm)
-                    T[n] = Ks[n] * (Kcb[n]-0.01) * ETref; // Estimated crop transpiration
+                    E[n] = Ke[n] * ETref; // Soil evaporation (mm)
+                    T[n] = Ks[n] * Kcb[n] * ETref; // Estimated crop transpiration
                     evaporationCumulative[n] = evaporationCumulative[n-1] + E[n];
                     transpirationCumulative[n] = transpirationCumulative[n-1] + T[n];
                     soilWater[n] = (soil.upperLimit * Z[n] * 1000) - Dr[n];
@@ -712,23 +716,23 @@ function model(){
                     precipCumulative[n] = precipCumulative[n-1] + precip;
                     ETrefCumulative[n] = ETrefCumulative[n-1] + ETref;
                     ETcropCumulative[n] = ETcropCumulative[n-1] + ETcrop[n];
-                    ETcropCumulativeNoStress[n] = ETcropCumulativeNoStress[n-1] + (Kcb[n] + Ke[n]) * ETref;
+                    transpirationCumulativeNoStress[n] = transpirationCumulativeNoStress[n-1] + Kcb[n] * ETref;
                     Kc[n] = Kcb[n] + Ke[n];
                 }
 
                 // Assimilate Field Observations
                 if(assimilateSoilMoistureObservations.checked && n < management.plantingToForecast){
-                    if(typeof observations[n].surfaceSoilWaterObs === 'number'){
+                    if(!isNaN(observations[n].surfaceSoilWaterObs) & typeof observations[n].surfaceSoilWaterObs === 'number'){
                         De[n] = (soil.upperLimit * soil.surfaceDepth) - observations[n].surfaceSoilWaterObs;
                         De[n] = Math.max(De[n],0);
                     }
-                    if(typeof observations[n].rootzoneSoilWaterObs  === 'number'){
+                    if(!isNaN(observations[n].rootzoneSoilWaterObs) & typeof observations[n].rootzoneSoilWaterObs  === 'number'){
                         Dr[n] = (soil.upperLimit * plant.rootDepth * 1000) - observations[n].rootzoneSoilWaterObs;
                     }
                 }
 
                 if(assimilateCanopyCoverObservations.checked && n < management.plantingToForecast){
-                    if(typeof observations[n].canopyCoverObs === 'number'){
+                    if(!isNaN(observations[n].canopyCoverObs) & typeof observations[n].canopyCoverObs === 'number'){
                         fc[n] = observations[n].canopyCoverObs/100;
                     }
                 }
@@ -738,8 +742,9 @@ function model(){
                 if(thermalUnitsCumulative[n] >= plant.lateThermalUnits || k+1 >= climate.length){
 
                     // Compute grain yield
-                    grainYield = plant.yieldPotential * (1 - plant.yieldResponse * (1 - ETcropCumulative[n]/ETcropCumulativeNoStress[n])); // Eq. 90, FAO-56 (based on FAO-33)
+                    grainYield = plant.yieldPotential * (1 - plant.yieldResponse * (1 - transpirationCumulative[n]/transpirationCumulativeNoStress[n])); // Similar to Eq. 90, FAO-56 (based on FAO-33)
                     grainYield = Math.max(grainYield,0);
+                    //grainYield =  transpirationCumulative[n] * 20/1000;
 
                     // Save output variables
                     let currentYear = climate[k].year;
@@ -800,57 +805,57 @@ function summaryStats(){
 
     // Soil Water
     let soilWater25 = {x: xForecasts, y:computeTrend(outputs.soilWater, 25), mode:'line', line: {color: "rgb(255, 23, 68)", dash: 'dot'}, name: "Lower Bound"};
-    let soilWater50 = {x: xForecasts, y:computeTrend(outputs.soilWater, 50), mode:'line', line: {color: "rgb(255, 23, 68)"}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Median Soil Water"};
+    let soilWater50 = {x: xForecasts, y:computeTrend(outputs.soilWater, 50), mode:'line', line: {color: "rgb(255, 23, 68)"}, name: "Median Soil Water"};
     let soilWater75 = {x: xForecasts, y:computeTrend(outputs.soilWater, 75), mode:'line', line: {color: "rgb(255, 23, 68)", dash: 'dot'}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Upper Bound"};
-    stats.soilWater = [soilWater25, soilWater50, soilWater75];
+    stats.soilWater = [soilWater25, soilWater75, soilWater50];
 
     // Soil Water Deficit
     let soilWaterDeficit25 = {x: xForecasts, y:computeTrend(outputs.soilWaterDeficit, 25), mode:'line', line: {color: "rgb(255, 23, 68)", dash: 'dot'}, name: "Lower Bound"};
-    let soilWaterDeficit50 = {x: xForecasts, y:computeTrend(outputs.soilWaterDeficit, 50), mode:'line', line: {color: "rgb(255, 23, 68)"}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Median Soil Water Deficit"};
+    let soilWaterDeficit50 = {x: xForecasts, y:computeTrend(outputs.soilWaterDeficit, 50), mode:'line', line: {color: "rgb(255, 23, 68)"}, name: "Median Soil Water Deficit"};
     let soilWaterDeficit75 = {x: xForecasts, y:computeTrend(outputs.soilWaterDeficit, 75), mode:'line', line: {color: "rgb(255, 23, 68)", dash: 'dot'}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Upper Bound"};
-    stats.soilWaterDeficit = [soilWaterDeficit25, soilWaterDeficit50, soilWaterDeficit75];
+    stats.soilWaterDeficit = [soilWaterDeficit25, soilWaterDeficit75, soilWaterDeficit50];
 
     // Canopy Cover
     let canopyCover25 = {x: xForecasts, y:computeTrend(outputs.canopyCover, 25), mode:'line', line: {color: "rgb(0, 150, 0)", dash: 'dot'}, name: "Lower Bound"};
-    let canopyCover50 = {x: xForecasts, y:computeTrend(outputs.canopyCover, 50), mode:'line', line: {color: "rgb(0, 150, 0)"}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Median Canopy Cover"};
+    let canopyCover50 = {x: xForecasts, y:computeTrend(outputs.canopyCover, 50), mode:'line', line: {color: "rgb(0, 150, 0)"}, name: "Median Canopy Cover"};
     let canopyCover75 = {x: xForecasts, y:computeTrend(outputs.canopyCover, 75), mode:'line', line: {color: "rgb(0, 150, 0)", dash: 'dot'}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Upper Bound"};
-    stats.canopyCover = [canopyCover25, canopyCover50, canopyCover75];
+    stats.canopyCover = [canopyCover25, canopyCover75, canopyCover50];
 
     // ETcrop Cumulative
     let ETcropCumulative25 = {x: xForecasts, y:computeTrend(outputs.ETcropCumulative, 25), mode:'line', line: {color: "rgb(255, 23, 68)", dash: 'dot'}, name: "Lower Bound", showlegend: false};
-    let ETcropCumulative50 = {x: xForecasts, y:computeTrend(outputs.ETcropCumulative, 50), mode:'line', line: {color: "rgb(255, 23, 68)"}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Median ETcrop"};
+    let ETcropCumulative50 = {x: xForecasts, y:computeTrend(outputs.ETcropCumulative, 50), mode:'line', line: {color: "rgb(255, 23, 68)"}, name: "Median ETcrop"};
     let ETcropCumulative75 = {x: xForecasts, y:computeTrend(outputs.ETcropCumulative, 75), mode:'line', line: {color: "rgb(255, 23, 68)", dash: 'dot'}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Upper Bound", showlegend: false};
-    stats.ETcropCumulative = [ETcropCumulative25, ETcropCumulative50, ETcropCumulative75];
+    stats.ETcropCumulative = [ETcropCumulative25, ETcropCumulative75, ETcropCumulative50];
 
     // ETref Cumulative
     let ETrefCumulative25 = {x: xForecasts, y:computeTrend(outputs.ETrefCumulative, 25), mode:'line', line: {color: "rgb(219, 6, 226)", dash: 'dot'}, name: "Lower Bound", showlegend: false};
-    let ETrefCumulative50 = {x: xForecasts, y:computeTrend(outputs.ETrefCumulative, 50), mode:'line', line: {color: "rgb(219, 6, 226)"}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Median ETref"};
+    let ETrefCumulative50 = {x: xForecasts, y:computeTrend(outputs.ETrefCumulative, 50), mode:'line', line: {color: "rgb(219, 6, 226)"}, name: "Median ETref"};
     let ETrefCumulative75 = {x: xForecasts, y:computeTrend(outputs.ETrefCumulative, 75), mode:'line', line: {color: "rgb(219, 6, 226)", dash: 'dot'}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Upper Bound", showlegend: false};
-    stats.ETrefCumulative = [ETrefCumulative25, ETrefCumulative50, ETrefCumulative75];
+    stats.ETrefCumulative = [ETrefCumulative25, ETrefCumulative75, ETrefCumulative50];
 
     // Precip Cumulative
     let precipCumulative25 = {x: xForecasts, y:computeTrend(outputs.precipCumulative, 25), mode:'line', line: {color: "rgb(68, 23, 225)", dash: 'dot'}, name: "Lower Bound"};
-    let precipCumulative50 = {x: xForecasts, y:computeTrend(outputs.precipCumulative, 50), mode:'line', line: {color: "rgb(68, 23, 225)"}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Median Precipitation"};
+    let precipCumulative50 = {x: xForecasts, y:computeTrend(outputs.precipCumulative, 50), mode:'line', line: {color: "rgb(68, 23, 225)"}, name: "Median Precipitation"};
     let precipCumulative75 = {x: xForecasts, y:computeTrend(outputs.precipCumulative, 75), mode:'line', line: {color: "rgb(68, 23, 225)", dash: 'dot'}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Upper Bound"};
-    stats.precipCumulative = [precipCumulative25, precipCumulative50, precipCumulative75];
+    stats.precipCumulative = [precipCumulative25, precipCumulative75, precipCumulative50];
 
     // Thermal Units Cumulative
     let thermalUnitsCumulative25 = {x: xForecasts, y:computeTrend(outputs.thermalUnitsCumulative, 25), mode:'line', line: {color: "rgb(230, 81, 0)", dash: 'dot'}, name: "Lower Bound"};
-    let thermalUnitsCumulative50 = {x: xForecasts, y:computeTrend(outputs.thermalUnitsCumulative, 50), mode:'line', line: {color: "rgb(230, 81, 0)"}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Median Thermal Units"};
+    let thermalUnitsCumulative50 = {x: xForecasts, y:computeTrend(outputs.thermalUnitsCumulative, 50), mode:'line', line: {color: "rgb(230, 81, 0)"}, name: "Median Thermal Units"};
     let thermalUnitsCumulative75 = {x: xForecasts, y:computeTrend(outputs.thermalUnitsCumulative, 75), mode:'line', line: {color: "rgb(230, 81, 0)", dash: 'dot'}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Upper Bound"};
-    stats.thermalUnitsCumulative = [thermalUnitsCumulative25, thermalUnitsCumulative50, thermalUnitsCumulative75];
+    stats.thermalUnitsCumulative = [thermalUnitsCumulative25, thermalUnitsCumulative75, thermalUnitsCumulative50];
 
     // Evaporation Cumulative
     let evaporationCumulative25 = {x: xForecasts, y:computeTrend(outputs.evaporationCumulative, 25), mode:'line', line: {color: "rgb(255, 23, 68)", dash: 'dot'}, name: "Lower Bound", showlegend: false};
-    let evaporationCumulative50 = {x: xForecasts, y:computeTrend(outputs.evaporationCumulative, 50), mode:'line', line: {color: "rgb(255, 23, 68)"}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Median Evaporation"};
+    let evaporationCumulative50 = {x: xForecasts, y:computeTrend(outputs.evaporationCumulative, 50), mode:'line', line: {color: "rgb(255, 23, 68)"}, name: "Median Evaporation"};
     let evaporationCumulative75 = {x: xForecasts, y:computeTrend(outputs.evaporationCumulative, 75), mode:'line', line: {color: "rgb(255, 23, 68)", dash: 'dot'}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Upper Bound", showlegend: false};
-    stats.evaporationCumulative = [evaporationCumulative25, evaporationCumulative50, evaporationCumulative75];
+    stats.evaporationCumulative = [evaporationCumulative25, evaporationCumulative75, evaporationCumulative50];
 
     // Transpiration Cumulative
     let transpirationCumulative25 = {x: xForecasts, y:computeTrend(outputs.transpirationCumulative, 25), mode:'line', line: {color: "rgb(0, 150, 0)", dash: 'dot'}, name: "Lower Bound", showlegend: false};
-    let transpirationCumulative50 = {x: xForecasts, y:computeTrend(outputs.transpirationCumulative, 50), mode:'line', line: {color: "rgb(0, 150, 0)"}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Median Transpiration"};
+    let transpirationCumulative50 = {x: xForecasts, y:computeTrend(outputs.transpirationCumulative, 50), mode:'line', line: {color: "rgb(0, 150, 0)"}, name: "Median Transpiration"};
     let transpirationCumulative75 = {x: xForecasts, y:computeTrend(outputs.transpirationCumulative, 75), mode:'line', line: {color: "rgb(0, 150, 0)", dash: 'dot'}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Upper Bound", showlegend: false};
-    stats.transpirationCumulative = [transpirationCumulative25, transpirationCumulative50, transpirationCumulative75];
+    stats.transpirationCumulative = [transpirationCumulative25, transpirationCumulative75, transpirationCumulative50];
 
     // Yield Cumulative Probability
     stats.grainYieldCumulativeProbability = [grainYieldCumulativeProbability];
@@ -889,7 +894,7 @@ function updatePlots(){
 function addFieldObservationsToPlot(){
     let soilWaterObs = {x:[], y:[], mode:'markers', name:'Observation'};
     for(let i=0; i<observations.length; i++){
-        if(typeof observations[i].rootzoneSoilWaterObs === 'number'){
+        if(!isNaN(observations[i].rootzoneSoilWaterObs) & typeof observations[i].rootzoneSoilWaterObs === 'number'){
             soilWaterObs.x.push( formatDatePlotly(observations[i].date)); 
             soilWaterObs.y.push(observations[i].rootzoneSoilWaterObs); 
         }
@@ -898,7 +903,7 @@ function addFieldObservationsToPlot(){
 
     let canopyCoverObs = {x:[], y:[], mode:'markers', name:'Observation', marker: {color: "rgb(0, 150, 0)"} };
     for(let i=0; i<observations.length; i++){
-        if(typeof observations[i].canopyCoverObs === 'number'){
+        if(!isNaN(observations[i].canopyCoverObs) & typeof observations[i].canopyCoverObs === 'number'){
             canopyCoverObs.x.push( formatDatePlotly(observations[i].date)); 
             canopyCoverObs.y.push(observations[i].canopyCoverObs/100); 
         }
@@ -970,7 +975,7 @@ function getDayOfYear(date) {
 
 function getKcbCurveValue(time,emg,ini,dev,mid,late,KcbIni,KcbMid,KcbEnd) {
     if(time <= emg){
-        Kcb = 0.01;
+        Kcb = 0;
     } else if(time > emg & time <= ini){
         Kcb = KcbIni;
     } else if (time > ini && time <= dev){

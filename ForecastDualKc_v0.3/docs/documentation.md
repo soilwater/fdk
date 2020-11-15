@@ -225,29 +225,27 @@ $DPr$ is the deep percolation of the rootzone
 
 The evaporation adn trasnpiration components of the crop ET are estimated by decoupling the basal and evaporation crop coefficients:
 
-$$ E = (K_e + K_{cb \ diff}) \ ET_{ref}$$
+$$ E = K_e \ ET_{ref}$$
 
-$$ T = K_s \ (K_{cb} - K_{cb \ diff}) \ ET_{ref}$$
+$$ T = K_s \ K_{cb} \ ET_{ref}$$
 
 $T$ is crop transpiration
 
 $E$ is soil evaporation
 
-$K_{cb \ diff}$ are diffusive losses from the rootzone included in the basal crop coefficient (Lollato et al., 2016). The magnitude of iffusive lossses can be typically quantified in field conditions during several weeks without rainfall and vegetation.
-
 ### 4.7 Grain yield
 
-Grain yield is approximated following th FAO Irrigation and Drainage Paper #33 (Doorenbos and Kassam, 1979):
+Grain yield is approximated following an approach similar to that proposed in the FAO Irrigation and Drainage Paper #33 (Doorenbos and Kassam, 1979):
 
-$$ \bigg( 1- \frac{Y_a}{Y_p} \bigg) = K_y \bigg(1- \frac{ET_a}{ET_c}\bigg)$$
+$$ \bigg( 1- \frac{Y_a}{Y_p} \bigg) = K_y \bigg(1- \frac{T_a}{T_c}\bigg)$$
 
 $Y_a$ is the actual grain yield in Mg/ha
 
-$Y_p$ is the potential yield in Mg/ha
+$Y_p$ is the field-specific (or regional) potential yield in Mg/ha
 
-$ET_a$ is the total actual crop evapotranspiration at the end of the growing season
+$T_a$ is the total actual crop transpiration at the end of the growing season
 
-$ET_c$ is the total crop evapotranspiration under non-stressed conditions at the end of the growing season
+$T_c$ is the total crop transpiration under non-stressed conditions at the end of the growing season
 
 >This approach for estiamting crop yield only provides a first-order approximation assuming the use of sound yield potential values and that yield reductions are mainly caused by soil water stress. The error in yield estimation is assumed to be low compared to the year-to-year yield variabilty due to weather conditions.
 
@@ -297,7 +295,6 @@ The core of the model model was implemented in Javascript and contains no extern
 
 - Doorenbos, J. and Kassam, A.H., 1979. FAO irrigation and drainage paper No. 33 “Yield response to water”. FAO–Food and Agriculture Organization of the United Nations, Rome.
   
-- Lollato, R.P., Patrignani, A., Ochsner, T.E. and Edwards, J.T., 2016. Prediction of plant available water at sowing for winter wheat in the Southern Great Plains. Agronomy Journal, 108(2), pp.745-757.
 
 <a name="version"></a>
 
