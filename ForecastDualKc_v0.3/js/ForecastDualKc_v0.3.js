@@ -192,7 +192,7 @@ for (var i = 0; i < stagesDurationConnect.length; i++) {
 }
 
 
-// Slider Kc Ini
+// Slider Kcb Ini
 let KcbIniSlider = document.getElementById('KcbIni');
 let KcbIniSliderValue = document.getElementById('KcbIniSliderValue');
 noUiSlider.create(KcbIniSlider, { start: 0.15, range: {'min': 0, 'max': 1}, step:0.01, format: wNumb({decimals: 2}) });
@@ -528,6 +528,8 @@ function model(){
     outputs.transpiration = [];
     outputs.transpirationCumulative = [];
     outputs.grainYield = [];
+    outputs.Ke = [];
+    outputs.Kcb = [];
 
     let k = 0, L = climate.length;
     while(k < L){
@@ -569,7 +571,6 @@ function model(){
             let ETrefCumulative = [];
             let ETcropCumulative = [];
             let transpirationCumulativeNoStress = [];
-            let Kc = [];
             let REW;
             let TEW;
             let few;
@@ -618,7 +619,7 @@ function model(){
                 if (n == 0){
                     thermalUnits = computeThermalUnits(tempAvg, plant.baseTempeature, plant.upperTempeature); 
                     thermalUnitsCumulative[n] = thermalUnits;
-                    if(options.constantRootDepth){ Z[n] = plant.rootDepth; } else { Z[n] = 0; }
+                    if(options.constantRootDepth){ Z[n] = plant.rootDepth; } else { Z[n] = 0.05; }
                     if(options.constantPlantHeight){ h[n] = plant.plantHeight; } else { h[n] = 0; }
                     if(precip > 0) { RO[n] = computeRunoff(precip, soil.curveNumber) } else { RO[n] = 0}; // Runoff based on the curve number method
                     De[n] = 1000 * (soil.upperLimit - soil.thetaInitialSurface) * soil.surfaceDepth; // initial depletion of surface layer
@@ -654,24 +655,37 @@ function model(){
                     ETrefCumulative[n] = ETref;
                     ETcropCumulative[n] = ETcrop[n];
                     transpirationCumulativeNoStress[n] = Kcb[n] * ETref;
-                    Kc[n] = Kcb[n] + Ke[n];
-    
+
                 } else {
 
                     // Simulate days 2 to harvest date
                     thermalUnits = computeThermalUnits(tempAvg, plant.baseTempeature, plant.upperTempeature);
                     thermalUnitsCumulative[n] = thermalUnitsCumulative[n-1] + thermalUnits;
-                    if(options.constantRootDepth){ Z[n] = plant.rootDepth; } else { Z[n] = Math.min( thermalUnitsCumulative[n]/plant.devThermalUnits*plant.rootDepth, plant.rootDepth); }
-                    if(options.constantPlantHeight){ h[n] = plant.plantHeight; } else {  h[n] = Math.min( thermalUnitsCumulative[n]/plant.devThermalUnits*plant.plantHeight, plant.plantHeight); }                       
+                    if(options.constantRootDepth){ 
+                        Z[n] = plant.rootDepth; 
+                    } else {
+                         Z[n] = thermalUnitsCumulative[n]/plant.devThermalUnits*plant.rootDepth; 
+                         Z[n] = Math.min(Z[n], plant.rootDepth);
+                         Z[n] = Math.max(Z[n], 0.05);
+                    }
+
+                    if(options.constantPlantHeight){
+                        h[n] = plant.plantHeight;
+                    } else {
+                         h[n] = thermalUnitsCumulative[n]/plant.devThermalUnits*plant.plantHeight;
+                         h[n] = Math.min(h[n], plant.plantHeight);
+                    }                       
                    
                     Kcb[n] = getKcbCurveValue(thermalUnitsCumulative[n], plant.emergenceThermalUnits, plant.iniThermalUnits, plant.devThermalUnits, plant.midThermalUnits, plant.lateThermalUnits, plant.KcbIni, plant.KcbMid, plant.KcbEnd)
-                    if(Kcb[n] > 0.45){ Kcb[n] = (Kcb[n] + [0.04 * (windSpeed - 2) - 0.004*(rhMin-45)] * (h[n]/3)**0.3) }; // FAO Eq. 70. Correct tabulated Kcb by local conditions
+                    if(Kcb[n] > 0.45){
+                        Kcb[n] = (Kcb[n] + [0.04 * (windSpeed - 2) - 0.004*(rhMin-45)] * (h[n]/3)**0.3);  // FAO Eq. 70. Correct tabulated Kcb by local conditions
+                    }
                     KcMax = Math.max((1.2 + [0.04 * (windSpeed - 2) - 0.004*(rhMin - 45)] * (h[n]/3)**0.3), Kcb[n] + 0.05); // Eq. 72, FAO-56
                    
                     if(thermalUnitsCumulative[n] < plant.emergenceThermalUnits){
                         fc[n] = 0;
                     } else if (thermalUnitsCumulative[n] >= plant.emergenceThermalUnits && thermalUnitsCumulative[n] < plant.devThermalUnits){
-                        fc[n] = Math.min( fc[n-1] + thermalUnits/(plant.devThermalUnits - plant.emergenceThermalUnits),0.99)
+                        fc[n] = Math.min( fc[n-1] + thermalUnits/(plant.devThermalUnits - plant.emergenceThermalUnits),0.95)
                     } else if (thermalUnitsCumulative[n] >= plant.devThermalUnits && thermalUnitsCumulative[n] < plant.midThermalUnits){
                         fc[n] = fc[n-1];
                     } else {
@@ -685,10 +699,15 @@ function model(){
                     } else {
                         Kr = (TEW - De[n-1])/(TEW - REW); // Eq. 74, FAO-56, evaporation reduction coefficient. 
                         //Kr = Math.min( REW/ETref, 0.15*(TEW - De[n-1])/(TEW - REW) ); // Torres and Calera 2010
-                    } 
-                    Ke[n] = Math.min(few * KcMax, Kr * (KcMax - Kcb[n])); // Eq. 71, FAO-56, soil evaporation coefficient
-                    if(precip > 0) { RO[n] = computeRunoff(precip, soil.curveNumber) } else { RO[n] = 0}; // Runoff based on the curve number method
+                    }
+
+                    if(precip > 0){
+                        RO[n] = computeRunoff(precip, soil.curveNumber); // Runoff based on the curve number method
+                    } else {
+                        RO[n] = 0;
+                    }
                     DPe[n]= Math.max(0, (precip - RO[n]) + irrigation[n]/soil.wettedFraction - De[n-1]); // Eq. 79, FAO-56 Drainage of water from the bottom of the evaporating layer
+                    Ke[n] = Math.min(few * KcMax, Kr * (KcMax - Kcb[n])); // Eq. 71, FAO-56, soil evaporation coefficient
                     De[n] = De[n-1] - (precip - RO[n]) - irrigation[n]/soil.wettedFraction +  (Ke[n] * ETref)/few + DPe[n]; // Eq. 77, FAO-56, Evaporative layer depletion. E = (Ke[n] * ETref)
                     De[n] = Math.min(TEW, De[n]); // Depletion cannot exceed TEW, required because F is not constrained. TEW was TEW[i]
                     p = plant.pTab + 0.04 * (5 - Kcb[n] * ETref); // Fig. 41, FAO-56
@@ -696,7 +715,11 @@ function model(){
                     p = Math.max(0.1, p); // Fig. 41, FAO-56
                     TAW[n] = 1000 * (soil.upperLimit - soil.lowerLimit) * Z[n];   // Eq. 82, FAO-56, total available water (mm). 
                     RAW = p * TAW[n]; // Eq. 83, FAO-56, readily plant available water capacity (mm)
-                    if (Dr[n-1] < RAW) {Ks[n] = 1} else {Ks[n] = (TAW[n] - Dr[n-1]) / (TAW[n] - RAW)} // Eq. 84, FAO-56, transpiration reduction factor
+                    if (Dr[n-1] < RAW){
+                        Ks[n] = 1;
+                    } else {
+                        Ks[n] = (TAW[n] - Dr[n-1]) / (TAW[n] - RAW);  // Eq. 84, FAO-56, transpiration reduction factor
+                    }
                     ETcrop[n] = (Ks[n] * Kcb[n] + Ke[n]) * ETref; // Eq. 80, FAO-56, total crop water use for the day (mm)
                     DPr[n] = Math.max((precip - RO[n]) + irrigation[n] - ETcrop[n] - Dr[n-1], 0);  // Eq. 88, FAO-56, drainage of water from the bottom of the root zone
                     depletionOfNewRootLength = 1000 * (soil.upperLimit - (soil.upperLimit + soil.lowerLimit)/2 ) * (Z[n] - Z[n-1]); // Estimate additional deficit of new root length. See Box 5 in Example 38
@@ -715,7 +738,6 @@ function model(){
                     ETrefCumulative[n] = ETrefCumulative[n-1] + ETref;
                     ETcropCumulative[n] = ETcropCumulative[n-1] + ETcrop[n];
                     transpirationCumulativeNoStress[n] = transpirationCumulativeNoStress[n-1] + Kcb[n] * ETref;
-                    Kc[n] = Kcb[n] + Ke[n];
                 }
 
                 // Assimilate Field Observations
@@ -769,6 +791,8 @@ function model(){
                     outputs.soilWaterDeficit.push({x:xVariable, y:soilWaterDeficit, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: lineColor}});
                     outputs.evaporation.push({x:xVariable, y:E, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: lineColor}});
                     outputs.transpiration.push({x:xVariable, y:T, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: lineColor}});
+                    outputs.Ke.push({x:xVariable, y:Ke, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: lineColor}});
+                    outputs.Kcb.push({x:xVariable, y:Kcb, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: lineColor}});
                     inGrowingSeason = false; // This will break the current while loop
                 }
 
