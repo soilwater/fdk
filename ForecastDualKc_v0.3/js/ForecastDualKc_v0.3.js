@@ -572,7 +572,6 @@ function model(){
             let Kc = [];
             let REW;
             let TEW;
-            let I;
             let few;
             let Kr;
             let KcMax;
