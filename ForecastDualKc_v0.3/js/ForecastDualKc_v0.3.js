@@ -265,6 +265,7 @@ let exportBtn = document.getElementById("exportBtn");
 exportBtn.addEventListener('click', exportProject);
 
 function exportProject(){
+    collectModelSettingsFromDOM()
     let filename = geolocation.name + '_';
     let exportData = {};
     if(document.getElementById('exportSettingsBox').checked){
@@ -461,9 +462,9 @@ function run(){
 ///// COLLECT UP MODEL settings /////
 function collectModelSettingsFromDOM(){
     geolocation = { name: projectNameElement.value,
+                    description: projectDescriptionElement.value,
                     altitude: parseFloat(altitudeElement.value), 
                     latitude: parseFloat(latitudeElement.value),
-                    description: projectDescriptionElement.value
     };
 
     plant = {KcbIni: parseFloat(KcbIniSlider.noUiSlider.get()),
