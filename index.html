@@ -28,10 +28,10 @@
 <body>
     <nav class="navbar z-depth-0 white" style="margin-top: 10px;">
         <div class="nav-wrapper">
-            <a href="#" class="brand-logo" style="font-size: 3rem; padding-left: 20px; color: rgb(104, 0, 201); font-weight: 600;">ForecastDualKc</a>
+            <a href="#" class="brand-logo deep-purple-text text-darken-1" style="font-size: 3rem; padding-left: 20px; font-weight: 600;">ForecastDualKc</a>
             <ul id="nav-mobile" class="right hide-on-med-and-down">
-            <li><a href="ForecastDualKc_v0.3/docs/documentation.html" target="_blank" class="deep-purple-text text-darken-2">Docs</a></li>
-            <li><a href="https://github.com/soilwaterksu/forecastdualkc" class="deep-purple-text text-darken-2">Github</a></li>
+            <li><a href="ForecastDualKc_v0.4/docs/documentation.html" target="_blank" class="deep-purple-text text-darken-1">Docs</a></li>
+            <li><a href="https://github.com/soilwaterksu/forecastdualkc" class="deep-purple-text text-darken-1">Github</a></li>
             </ul>
         </div>
     </nav>
@@ -108,78 +108,6 @@
                     </div>
                 </li>
 
-                <!-- DATE CONTROLS -->
-                <li class="active">
-                    <div class="collapsible-header purple-text text-darken-1"><i class="material-icons">timeline</i>Forecast Dates</div>
-                    <div class="collapsible-body">
-                        <div class="row">
-                            <div class="col s12 m12 l12 xl12">
-                                <div id="managementDates" class="custom-slider"></div>
-                                <div id="plantingDateSliderValue"></div>
-                                <div id="forecastingDateSliderValue"></div>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                
-                <!-- SOIL CONTROLS -->
-                <li>
-                    <div class="collapsible-header brown-text text-darken-1"><i class="material-icons">layers</i>Soil</div>
-                    <div class="collapsible-body">
-                        <div class="row">
-                            <div class="col s12 m12 l6 xl6">
-                                <div id="surfaceDepth" class="custom-slider tooltipped"  data-position="top" data-tooltip="Depth of evaporation layer. Typically 0.1 to 0.2 m."></div>
-                                <div id="surfaceDepthSliderValue"></div>
-                            </div>
-                            <div class="col s12 m12 l6 xl6">
-                                <div id="readilyEvaporableWater" class="custom-slider tooltipped" data-position="top" data-tooltip="Fraction of total evaporable water. Typically 0.5."></div>
-                                <div id="readilyEvaporableWaterSliderValue"></div>
-                            </div>
-                        </div>    
-
-                        <div class="row">
-                            <div class="col s12 m12 l6 xl6">
-                                <div id="thetaInitialSurface" class="custom-slider tooltipped" data-position="top" data-tooltip="Soil moisture of the surface layer."></div>
-                                <div id="thetaInitialSurfaceSliderValue"></div>
-                            </div>
-                            <div class="col s12 m12 l6 xl6">
-                                <div id="thetaInitialRootzone" class="custom-slider tooltipped" data-position="top" data-tooltip="Soil moisture of the rootzone."></div>
-                                <div id="thetaInitialRootzoneSliderValue"></div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col s12 m12 l6 xl6">
-                                <div id="lowerLimit" class="custom-slider tooltipped" data-position="top" data-tooltip="Permanent wilting point (soil water at a matric potential of -1500 kPa)"></div>
-                                <div id="lowerLimitSliderValue"></div>
-                            </div>
-                            <div class="col s12 m12 l6 xl6">
-                                <div id="upperLimit" class="custom-slider tooltipped" data-position="top" data-tooltip="Field capacity (soil water at a matric potential of -10 kPa)" ></div>
-                                <div id="upperLimitSliderValue"></div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col s12 m12 l6 xl6">
-                                <div id="residueCover" class="custom-slider" ></div>
-                                <div id="residueCoverSliderValue"></div>
-                            </div>
-                            <div class="col s12 m12 l6 xl6">
-                                <div id="wettedFraction" class="custom-slider tooltipped" data-position="top" data-tooltip="Average fraction of soil surface wetted by irrigation [0.01 to 1]"></div>
-                                <div id="wettedFractionSliderValue"></div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col s12 m12 l6 xl6">
-                                <div id="curveNumber" class="custom-slider tooltipped" data-position="top" data-tooltip="Agricultural fields typically range from 60 (low runoff) to 95 (high runoff)"></div>
-                                <div id="curveNumberSliderValue"></div>
-                            </div>
-
-                        </div>                        
-                    </div>
-                </li>
-
                 <!-- PLANT CONTROLS -->
                 <li>
                     <div class="collapsible-header green-text text-darken-1"><i class="material-icons">grass</i>Plant</div>
@@ -250,6 +178,65 @@
                         </div>
                     </div>
                 </li>
+                
+                <!-- SOIL CONTROLS -->
+                <li>
+                    <div class="collapsible-header brown-text text-darken-1"><i class="material-icons">layers</i>Soil</div>
+                    <div class="collapsible-body">
+                        <div class="row">
+                            <div class="col s12 m12 l6 xl6">
+                                <div id="surfaceDepth" class="custom-slider tooltipped"  data-position="top" data-tooltip="Depth of evaporation layer. Typically 0.1 to 0.2 m."></div>
+                                <div id="surfaceDepthSliderValue"></div>
+                            </div>
+                            <div class="col s12 m12 l6 xl6">
+                                <div id="readilyEvaporableWater" class="custom-slider tooltipped" data-position="top" data-tooltip="Fraction of total evaporable water. Typically 0.5."></div>
+                                <div id="readilyEvaporableWaterSliderValue"></div>
+                            </div>
+                        </div>    
+
+                        <div class="row">
+                            <div class="col s12 m12 l6 xl6">
+                                <div id="thetaInitialSurface" class="custom-slider tooltipped" data-position="top" data-tooltip="Soil moisture of the surface layer."></div>
+                                <div id="thetaInitialSurfaceSliderValue"></div>
+                            </div>
+                            <div class="col s12 m12 l6 xl6">
+                                <div id="thetaInitialRootzone" class="custom-slider tooltipped" data-position="top" data-tooltip="Soil moisture of the rootzone."></div>
+                                <div id="thetaInitialRootzoneSliderValue"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col s12 m12 l6 xl6">
+                                <div id="lowerLimit" class="custom-slider tooltipped" data-position="top" data-tooltip="Permanent wilting point (soil water at a matric potential of -1500 kPa)"></div>
+                                <div id="lowerLimitSliderValue"></div>
+                            </div>
+                            <div class="col s12 m12 l6 xl6">
+                                <div id="upperLimit" class="custom-slider tooltipped" data-position="top" data-tooltip="Field capacity (soil water at a matric potential of -10 kPa)" ></div>
+                                <div id="upperLimitSliderValue"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col s12 m12 l6 xl6">
+                                <div id="residueCover" class="custom-slider" ></div>
+                                <div id="residueCoverSliderValue"></div>
+                            </div>
+                            <div class="col s12 m12 l6 xl6">
+                                <div id="wettedFraction" class="custom-slider tooltipped" data-position="top" data-tooltip="Average fraction of soil surface wetted by irrigation [0.01 to 1]"></div>
+                                <div id="wettedFractionSliderValue"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col s12 m12 l6 xl6">
+                                <div id="curveNumber" class="custom-slider tooltipped" data-position="top" data-tooltip="Agricultural fields typically range from 60 (low runoff) to 95 (high runoff)"></div>
+                                <div id="curveNumberSliderValue"></div>
+                            </div>
+
+                        </div>                        
+                    </div>
+                </li>
+
 
                 <!-- NITROGEN RECOMMENDATION-->
                 <li>
@@ -268,6 +255,20 @@
                                 <input value="" id="Ndemand" type="number" class="validate" min="0">
                                 <div>N demand (kg/ha)</div>
                             </div>    
+                        </div>
+                    </div>
+                </li>
+
+                <!-- DATE FORECAST CONTROLS -->
+                <li>
+                    <div class="collapsible-header purple-text text-darken-1"><i class="material-icons">timeline</i>Forecast Dates</div>
+                    <div class="collapsible-body">
+                        <div class="row">
+                            <div class="col s12 m12 l12 xl12">
+                                <div id="managementDates" class="custom-slider"></div>
+                                <div id="plantingDateSliderValue"></div>
+                                <div id="forecastingDateSliderValue"></div>
+                            </div>
                         </div>
                     </div>
                 </li>
@@ -327,8 +328,18 @@
 
                 <!-- IMPORT/EXPORT-->
                 <li>
-                    <div class="collapsible-header grey-text text-darken-2"><i class="material-icons">import_export</i>Import/Export</div>
+                    <div class="collapsible-header grey-text text-darken-2"><i class="material-icons">import_export</i>Import/Export Project</div>
                     <div class="collapsible-body">
+
+                        <!-- IMPORT -->
+                        <p class="grey-text">Use this option to load FDK projects. If your file only contains model settings, you first need to load climate and weather observations. </p>
+                        <div class="row">
+                            <div class="col sm12 m12 l6 xl6">
+                                <span class="btn btn-file btn-small waves-effect deep-purple darken-1"><i class="material-icons left">file_upload</i>Import<input id="importBtn" type="file"></span>
+                            </div>
+                        </div>
+
+                        <hr class="divider" style="margin-top: 50px; margin-bottom: 20px;">
 
                         <!-- EXPORT -->
                         <p class="grey-text">Use this option to share, store, or further analyze FDK projects. Selecting "Settings" + "Inputs" will make your project fully reproducible by anyone.</p>
@@ -352,17 +363,10 @@
                                         <span>Outputs</span>
                                     </label>
                                 </p>
-                                <a id="exportBtn" href="" class="btn btn-small purple darken-3"><i class="material-icons left">file_download</i>Export</a>                
+                                <a id="exportBtn" href="" class="btn btn-small waves-effect deep-purple darken-1"><i class="material-icons left">file_download</i>Export</a>                
                             </div>
                         </div>
 
-                        <!-- IMPORT -->
-                        <p class="grey-text">Use this option to load FDK projects. If your file only contains model settings, you first need to load climate and observations. </p>
-                        <div class="row">
-                            <div class="col sm12 m12 l6 xl6">
-                                <span class="btn btn-file btn-small purple darken-1"><i class="material-icons left">file_upload</i>Import<input id="importBtn" type="file"></span>
-                            </div>
-                        </div>
                     </div>
                     
                 </li>
@@ -377,8 +381,8 @@
     <main>
 
         <div id="landing" style="padding:15vw; height: 85vh;">
-            <p class="grey-text center-align" style="font-size: 1.2rem;">Press  <a id="loadExampleDatasetBtn" class="btn waves-effect deep-purple darken-2">Play</a> to load some data and start using ForecastDualKc.
-                You can also generate your own climate and observation files. Use this <a class="btn waves-effect deep-purple darken-3" href="ForecastDualKc_v0.3/dataset/dataset.zip" download="example_dataset.zip">Example CSV dataset</a> to get started.</p>
+            <p class="grey-text center-align" style="font-size: 1.2rem;">Press  <a id="loadExampleDatasetBtn" class="btn waves-effect deep-purple darken-1">Play</a> to load some data and start using ForecastDualKc.
+                You can also generate your own climate and observation files. Use this <a class="btn waves-effect deep-purple darken-1" href="ForecastDualKc_v0.3/dataset/dataset.zip" download="example_dataset.zip">Example CSV dataset</a> to get started.</p>
         </div>
 
         <div id="dashboard" style="display: none;">

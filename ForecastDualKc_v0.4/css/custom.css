@@ -22,12 +22,16 @@ header, main, footer, nav {
 }
 
 .sidenav{
-    width: max(25vw,350px);
+    width: max(25vw,300px);
 }
 
 .sidenav li{
-    line-height: 30px;
+    line-height: 40px;
     
+}
+
+li p{
+    line-height: 1.5;
 }
 
 .myplot{
