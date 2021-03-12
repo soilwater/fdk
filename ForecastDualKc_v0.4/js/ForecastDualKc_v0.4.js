@@ -892,7 +892,7 @@ function summaryStats(){
 
     // Nitrogen variables
     let updatedYieldGoal = Math.round(percentile(yieldXProb, 50)*100)/100;
-    let cropNitrogenDemand = updatedYieldGoal * parseFloat(document.getElementById('Nreq').value);
+    let cropNitrogenDemand = Math.round(updatedYieldGoal * parseFloat(document.getElementById('Nreq').value));
     document.getElementById('medianYield').value = updatedYieldGoal;
     document.getElementById('Ndemand').value = cropNitrogenDemand;
 }
