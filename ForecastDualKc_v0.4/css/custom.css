@@ -22,7 +22,7 @@ header, main, footer, nav {
 }
 
 .sidenav{
-    width: 25vw;
+    width: max(25vw,350px);
 }
 
 .sidenav li{
