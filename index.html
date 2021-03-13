@@ -28,10 +28,10 @@
 <body>
     <nav class="navbar z-depth-0 white" style="margin-top: 10px;">
         <div class="nav-wrapper">
-            <a href="#" class="brand-logo deep-purple-text text-darken-1" style="font-size: 3rem; padding-left: 20px; font-weight: 600;">ForecastDualKc</a>
+            <a href="#" class="brand-logo grey-text text-darken-3" style="font-size: 3rem; padding-left: 20px; font-weight: 600;">ForecastDualKc</a>
             <ul id="nav-mobile" class="right hide-on-med-and-down">
-            <li><a href="ForecastDualKc_v0.4/docs/documentation.html" target="_blank" class="deep-purple-text text-darken-1">Docs</a></li>
-            <li><a href="https://github.com/soilwaterksu/forecastdualkc" class="deep-purple-text text-darken-1">Github</a></li>
+            <li><a href="ForecastDualKc_v0.4/docs/documentation.html" target="_blank" class="deep-purple-text text-darken-1"><b>Docs</b></a></li>
+            <li><a href="https://github.com/soilwaterksu/forecastdualkc" class="deep-purple-text text-darken-1"><b>Github</b></a></li>
             </ul>
         </div>
     </nav>
@@ -39,53 +39,39 @@
     <div class="divider"></div>
 
     <ul id="slide-out" class="sidenav sidenav-fixed custom-sidenav">
-        <div style="padding-top: 90px;"></div>
+        <div style="padding-top: 10px;"></div>
         <div class="model-controls">
             
             <ul class="collapsible expandable">
                 <li>
-                    <!-- <img src="icon.png" width=150 style='margin-top: -50px; padding-bottom: 30px;'> -->
+                    <img src="icon.png" width=200 class="responsive-img center-align" style='margin-top: 20px; margin-bottom: 20px; padding-left: 10px;'>
                 </li>
 
                 <!-- LOCATION CONTROLS -->
                 <li>
-                    <div class="collapsible-header orange-text text-darken-1"><i class="material-icons">place</i>Location</div>
-                    <div class="collapsible-body">
+                    <div class="collapsible-header pink-text text-darken-2"><i class="material-icons">place</i>Location</div>
+                    <div class="collapsible-body body-location">
                         <div class="row">
                             <div class="input-field col s12 m12 l6 xl6">
                                 <input value="example_field" id="projectName" type="text" class="validate">
-                                <div>Name</div>
+                                <div class="field-label">Name</div>
                             </div>
                             <div class="input-field col s12 m12 l3 xl3">
                                 <input value="39.1" id="latitude" type="number" class="validate" min="-90" max="90" step="0.1">
-                                <div>Latitude</div>
+                                <div class="field-label">Latitude</div>
                             </div>
                             <div class="input-field col s12 m12 l3 xl3">
                                 <input value="300" id="altitude" type="number" class="validate" min="-100" max="8000" step="1">
-                                <div class="tooltipped" data-position="bottom" data-tooltip="Meters above sea level">Altitude</div>
+                                <div class="tooltipped field-label" data-position="bottom" data-tooltip="Meters above sea level">Altitude</div>
                             </div>
                         </div>
-                    </div>
-                </li>
-
-                <!-- DESCRIPTION CONTROLS -->
-                <li>
-                    <div class="collapsible-header"><i class="material-icons">short_text</i>Description</div>
-                    <div class="collapsible-body">
-                        <form class="col s12">
-                            <div class="row">
-                            <div class="input-field col s12">
-                                <textarea id="projectDescription" class="materialize-textarea" rows="5" placeholder="Add a brief description for this project. Include references, links, DOI, and contact information."></textarea>
-                            </div>
-                            </div>
-                        </form>
                     </div>
                 </li>
                 
                 <!-- ATMOSPHERE CONTROLS -->
                 <li>
-                    <div class="collapsible-header blue-text text-darken-1"><i class="material-icons">wb_cloudy</i>Atmosphere</div>
-                    <div class="collapsible-body">
+                    <div class="collapsible-header blue-text text-darken-1"><i class="material-icons">cloud_queue</i>Atmosphere</div>
+                    <div class="collapsible-body body-atmosphere">
                         <div class="file-field input-field">
                             <div class="btn-small white black-text tooltipped" data-position="top" data-tooltip="File with historical weather data for the field or region.">
                                 <span>Climate Data &nbsp;</span>
@@ -111,16 +97,16 @@
                 <!-- PLANT CONTROLS -->
                 <li>
                     <div class="collapsible-header green-text text-darken-1"><i class="material-icons">grass</i>Plant</div>
-                    <div class="collapsible-body">
+                    <div class="collapsible-body body-plant">
                         <div class="row">
                             <div class="col s12 m12 l12 xl12">
                                 <div>Crop stages</div>
                                 <div id="stagesDuration" class="custom-slider" ></div>
-                                <div id="emergenceSliderValue"></div>
-                                <div id="iniSliderValue"></div>
-                                <div id="devSliderValue"></div>
-                                <div id="midSliderValue"></div>
-                                <div id="lateSliderValue"></div>
+                                <div id="emergenceSliderValue" class="field-label"></div>
+                                <div id="iniSliderValue" class="field-label"></div>
+                                <div id="devSliderValue" class="field-label"></div>
+                                <div id="midSliderValue" class="field-label"></div>
+                                <div id="lateSliderValue" class="field-label"></div>
                             </div>
                         </div>
             
@@ -128,52 +114,52 @@
                         <div class="row">
                             <div class="col s12 m12 l4 xl4">
                                 <div id="KcbIni" class="custom-slider tooltipped" data-position="top" data-tooltip="Minimum basal coefficient"></div>
-                                <div id="KcbIniSliderValue"></div>
+                                <div id="KcbIniSliderValue" class="field-label"></div>
                             </div>
                             <div class="col s12 m12 l4 xl4">
                                 <div id="KcbMid" class="custom-slider tooltipped" data-position="top" data-tooltip="Mid season basal coefficient"></div>
-                                <div id="KcbMidSliderValue"></div>
+                                <div id="KcbMidSliderValue" class="field-label"></div>
                             </div>
                             <div class="col s12 m12 l4 xl4">
                                 <div id="KcbEnd" class="custom-slider tooltipped" data-position="top" data-tooltip="End season basal crop coefficient"></div>
-                                <div id="KcbEndSliderValue"></div>
+                                <div id="KcbEndSliderValue" class="field-label"></div>
                             </div>
                         </div>
                         
                         <div class="row">
                             <div class="col s12 m12 l4 xl4">
                                 <div id="baseTemp" class="custom-slider"></div>
-                                <div id="baseTempSliderValue"></div>
+                                <div id="baseTempSliderValue" class="field-label"></div>
                             </div>
                             <div class="col s12 m12 l4 xl4">
                                 <div id="upperTemp" class="custom-slider" ></div>
-                                <div id="upperTempSliderValue"></div>
+                                <div id="upperTempSliderValue" class="field-label"></div>
                             </div>
                             <div class="col s12 m12 l4 xl4">
                                 <div id="pTab" class="custom-slider tooltipped" data-position="top" data-tooltip="Fraction of total available water readily available for the crop. Typically 0.5."></div>  
-                                <div id="pTabSliderValue"></div>
+                                <div id="pTabSliderValue" class="field-label"></div>
                             </div>
                         </div>
             
                         <div class="row">
                             <div class="col s12 m12 l6 xl6">
                                 <div id="plantHeight" class="custom-slider"></div>
-                                <div id="plantHeightSliderValue"></div>
+                                <div id="plantHeightSliderValue" class="field-label"></div>
                             </div>
                             <div class="col s12 m12 l6 xl6">
                                 <div id="rootDepth" class="custom-slider" ></div>
-                                <div id="rootDepthSliderValue"></div>
+                                <div id="rootDepthSliderValue" class="field-label"></div>
                             </div>
                         </div>
                                    
                         <div class="row">
                             <div class="col s12 m12 l6 xl6">
                                 <div id="yieldResponse" class="custom-slider tooltipped" data-position="top" data-tooltip="Susceptibility of yield components to seasonal water stress"></div>  
-                                <div id="yieldResponseSliderValue"></div>
+                                <div id="yieldResponseSliderValue" class="field-label"></div>
                             </div>
                             <div class="col s12 m12 l6 xl6">
                                 <div id="yieldPotential" class="custom-slider tooltipped" data-position="top" data-tooltip="Yield goal for your field under non-limitating conditions."></div>  
-                                <div id="yieldPotentialSliderValue"></div>
+                                <div id="yieldPotentialSliderValue" class="field-label"></div>
                             </div>
                         </div>
                     </div>
@@ -182,55 +168,55 @@
                 <!-- SOIL CONTROLS -->
                 <li>
                     <div class="collapsible-header brown-text text-darken-1"><i class="material-icons">layers</i>Soil</div>
-                    <div class="collapsible-body">
+                    <div class="collapsible-body body-soil">
                         <div class="row">
                             <div class="col s12 m12 l6 xl6">
                                 <div id="surfaceDepth" class="custom-slider tooltipped"  data-position="top" data-tooltip="Depth of evaporation layer. Typically 0.1 to 0.2 m."></div>
-                                <div id="surfaceDepthSliderValue"></div>
+                                <div id="surfaceDepthSliderValue" class="field-label"></div>
                             </div>
                             <div class="col s12 m12 l6 xl6">
                                 <div id="readilyEvaporableWater" class="custom-slider tooltipped" data-position="top" data-tooltip="Fraction of total evaporable water. Typically 0.5."></div>
-                                <div id="readilyEvaporableWaterSliderValue"></div>
+                                <div id="readilyEvaporableWaterSliderValue" class="field-label"></div>
                             </div>
                         </div>    
 
                         <div class="row">
                             <div class="col s12 m12 l6 xl6">
                                 <div id="thetaInitialSurface" class="custom-slider tooltipped" data-position="top" data-tooltip="Soil moisture of the surface layer."></div>
-                                <div id="thetaInitialSurfaceSliderValue"></div>
+                                <div id="thetaInitialSurfaceSliderValue" class="field-label"></div>
                             </div>
                             <div class="col s12 m12 l6 xl6">
                                 <div id="thetaInitialRootzone" class="custom-slider tooltipped" data-position="top" data-tooltip="Soil moisture of the rootzone."></div>
-                                <div id="thetaInitialRootzoneSliderValue"></div>
+                                <div id="thetaInitialRootzoneSliderValue" class="field-label"></div>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col s12 m12 l6 xl6">
                                 <div id="lowerLimit" class="custom-slider tooltipped" data-position="top" data-tooltip="Permanent wilting point (soil water at a matric potential of -1500 kPa)"></div>
-                                <div id="lowerLimitSliderValue"></div>
+                                <div id="lowerLimitSliderValue" class="field-label"></div>
                             </div>
                             <div class="col s12 m12 l6 xl6">
                                 <div id="upperLimit" class="custom-slider tooltipped" data-position="top" data-tooltip="Field capacity (soil water at a matric potential of -10 kPa)" ></div>
-                                <div id="upperLimitSliderValue"></div>
+                                <div id="upperLimitSliderValue" class="field-label"></div>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col s12 m12 l6 xl6">
                                 <div id="residueCover" class="custom-slider" ></div>
-                                <div id="residueCoverSliderValue"></div>
+                                <div id="residueCoverSliderValue" class="field-label"></div>
                             </div>
                             <div class="col s12 m12 l6 xl6">
                                 <div id="wettedFraction" class="custom-slider tooltipped" data-position="top" data-tooltip="Average fraction of soil surface wetted by irrigation [0.01 to 1]"></div>
-                                <div id="wettedFractionSliderValue"></div>
+                                <div id="wettedFractionSliderValue" class="field-label"></div>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col s12 m12 l6 xl6">
                                 <div id="curveNumber" class="custom-slider tooltipped" data-position="top" data-tooltip="Agricultural fields typically range from 60 (low runoff) to 95 (high runoff)"></div>
-                                <div id="curveNumberSliderValue"></div>
+                                <div id="curveNumberSliderValue" class="field-label"></div>
                             </div>
 
                         </div>                        
@@ -240,20 +226,20 @@
 
                 <!-- NITROGEN RECOMMENDATION-->
                 <li>
-                    <div class="collapsible-header grey-text text-darken-2 "><i class="material-icons">grain</i>Nitrogen</div>
-                    <div class="collapsible-body">
+                    <div class="collapsible-header orange-text text-darken-1"><i class="material-icons">grain</i>Nitrogen</div>
+                    <div class="collapsible-body body-nitrogen">
                         <div class="row">
                             <div class="input-field col s12 m12 l4 xl4">
                                 <input value="" id="medianYield" type="number" class="validate" min="0">
-                                <div>Yield goal (Mg/ha)</div>
+                                <div class="field-label">Yield goal (Mg/ha)</div>
                             </div>
                             <div class="input-field col s12 m12 l4 xl4">
                                 <input value="30" id="Nreq" type="number" class="validate" min="0">
-                                <div>N req. (kg N/Mg)</div>
+                                <div class="field-label">N req. (kg N/Mg)</div>
                             </div>
                             <div class="input-field col s12 m12 l4 xl4">
                                 <input value="" id="Ndemand" type="number" class="validate" min="0">
-                                <div>N demand (kg/ha)</div>
+                                <div class="field-label">N demand (kg/ha)</div>
                             </div>    
                         </div>
                     </div>
@@ -262,12 +248,12 @@
                 <!-- DATE FORECAST CONTROLS -->
                 <li>
                     <div class="collapsible-header purple-text text-darken-1"><i class="material-icons">timeline</i>Forecast Dates</div>
-                    <div class="collapsible-body">
+                    <div class="collapsible-body body-forecast">
                         <div class="row">
                             <div class="col s12 m12 l12 xl12">
                                 <div id="managementDates" class="custom-slider"></div>
-                                <div id="plantingDateSliderValue"></div>
-                                <div id="forecastingDateSliderValue"></div>
+                                <div id="plantingDateSliderValue" class="field-label"></div>
+                                <div id="forecastingDateSliderValue" class="field-label"></div>
                             </div>
                         </div>
                     </div>
@@ -276,7 +262,7 @@
                 <!-- OPTIONS CONTROLS -->
                 <li>
                     <div class="collapsible-header grey-text text-darken-2 "><i class="material-icons">settings</i>Options</div>
-                    <div class="collapsible-body">
+                    <div class="collapsible-body body-generic">
                         <div class="row">
                             <div class="col s12 m12 l12 xl12">
                                 <label>
@@ -329,7 +315,7 @@
                 <!-- IMPORT/EXPORT-->
                 <li>
                     <div class="collapsible-header grey-text text-darken-2"><i class="material-icons">import_export</i>Import/Export Project</div>
-                    <div class="collapsible-body">
+                    <div class="collapsible-body body-generic">
 
                         <!-- IMPORT -->
                         <p class="grey-text">Use this option to load FDK projects. If your file only contains model settings, you first need to load climate and weather observations. </p>
@@ -370,6 +356,20 @@
                     </div>
                     
                 </li>
+
+                <!-- DESCRIPTION CONTROLS -->
+                <li>
+                    <div class="collapsible-header grey-text text-darken-2"><i class="material-icons">short_text</i>Description</div>
+                    <div class="collapsible-body body-generic">
+                        <form class="col s12">
+                            <div class="row">
+                            <div class="input-field col s12">
+                                <textarea id="projectDescription" class="materialize-textarea" rows="5" placeholder="Add a brief description for this project. Include references, links, DOI, and contact information."></textarea>
+                            </div>
+                            </div>
+                        </form>
+                    </div>
+                </li>
             </ul>
 
         </div> <!-- end of model controls -->
@@ -382,7 +382,7 @@
 
         <div id="landing" style="padding:15vw; height: 85vh;">
             <p class="grey-text center-align" style="font-size: 1.2rem;">Press  <a id="loadExampleDatasetBtn" class="btn waves-effect deep-purple darken-1">Play</a> to load some data and start using ForecastDualKc.
-                You can also generate your own climate and observation files. Use this <a class="btn waves-effect deep-purple darken-1" href="ForecastDualKc_v0.3/dataset/dataset.zip" download="example_dataset.zip">Example CSV dataset</a> to get started.</p>
+                You can also load your own climate and weather files. Use this <a class="btn waves-effect deep-purple darken-1" href="ForecastDualKc_v0.4/dataset/dataset.zip" download="example_dataset.zip">Example CSV dataset</a> to get started.</p>
         </div>
 
         <div id="dashboard" style="display: none;">

@@ -26,12 +26,57 @@ header, main, footer, nav {
 }
 
 .sidenav li{
-    line-height: 40px;
-    
+    line-height: 30px;
 }
 
 li p{
     line-height: 1.5;
+}
+
+.field-label{
+    line-height: 1.5;
+}
+
+.body-location{
+    border-left: 5px !important;
+    border-style: solid !important;
+    border-left-color: #c2185b !important;
+}
+
+.body-atmosphere{
+    border-left: 5px !important;
+    border-style: solid !important;
+    border-left-color: #1e88e5 !important;
+}
+
+.body-plant{
+    border-left: 5px !important;
+    border-style: solid !important;
+    border-left-color: #43a047 !important;
+}
+
+.body-soil{
+    border-left: 5px !important;
+    border-style: solid !important;
+    border-left-color: #6d4c41 !important;
+}
+
+.body-nitrogen{
+    border-left: 5px !important;
+    border-style: solid !important;
+    border-left-color: #fb8c00 !important;
+}
+
+.body-forecast{
+    border-left: 5px !important;
+    border-style: solid !important;
+    border-left-color: #8e24aa !important; 
+}
+
+.body-generic{
+    border-left: 5px !important;
+    border-style: solid !important;
+    border-left-color: #616161 !important; 
 }
 
 .myplot{
@@ -56,6 +101,8 @@ ul .row{
 .collapsible-body{
     padding-top: 20px !important;
     padding-bottom: 20px !important;
+    margin-bottom: 30px !important;
+    padding-left: 5px !important;
     background-color:rgb(250, 250, 250) !important;
 }
 

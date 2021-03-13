@@ -49,11 +49,8 @@ function loadExampleDataset(){
     fetch('ForecastDualKc_v0.3/dataset/example_field_settings_inputs_ForecastDualKc.json')
     .then( results=>results.text() )
     .then( data=>runUploadProject(JSON.parse(data)))
-    document.querySelector('.collapsible').M_Collapsible.open(7)
+    document.querySelector('.collapsible').M_Collapsible.open(6)
 }
-
-// Header variables
-
 
 // Input box project name
 let projectNameElement = document.getElementById('projectName');
