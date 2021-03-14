@@ -916,9 +916,11 @@ function summaryStats(){
 }
 
 function updatePlots(){
+    // Update nitrogen recommendation components
     medianYieldGoalElement.value = stats.medianYieldGoal;
     medianNRecommendationElement.value = stats.medianNRecommendation;
 
+    // Update charts
     config = {modeBarButtonsToRemove: ['hoverCompareCartesian', 'lasso2d'], responsive: true};
 
     Plotly.react('plotSoilWater', stats.soilWater, { yaxis: {title: "Rootzone Soil Water (mm)"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
@@ -949,7 +951,7 @@ function updatePlots(){
 
 
 function addFieldObservationsToPlot(){
-    let soilWaterObs = {x:[], y:[], mode:'markers', name:'Observation'};
+    let soilWaterObs = {x:[], y:[], mode:'markers', name:'Observation', marker: {color: "rgb(20, 120, 20)", size: 8} };
     for(let i=0; i<observations.length; i++){
         if(!isNaN(observations[i].rootzoneSoilWaterObs) & typeof observations[i].rootzoneSoilWaterObs === 'number'){
             soilWaterObs.x.push( formatDatePlotly(observations[i].date)); 
@@ -958,7 +960,7 @@ function addFieldObservationsToPlot(){
     }
     Plotly.addTraces('plotSoilWater', soilWaterObs);
 
-    let surfaceSoilWaterObs = {x:[], y:[], mode:'markers', name:'Observation'};
+    let surfaceSoilWaterObs = {x:[], y:[], mode:'markers', name:'Observation', marker: {color: "rgb(20, 120, 20)", size: 8}};
     for(let i=0; i<observations.length; i++){
         if(!isNaN(observations[i].surfaceSoilWaterObs) & typeof observations[i].surfaceSoilWaterObs === 'number'){
             surfaceSoilWaterObs.x.push( formatDatePlotly(observations[i].date)); 
@@ -967,7 +969,7 @@ function addFieldObservationsToPlot(){
     }
     Plotly.addTraces('plotSurfaceSoilWater', surfaceSoilWaterObs);
 
-    let canopyCoverObs = {x:[], y:[], mode:'markers', name:'Observation', marker: {color: "rgb(0, 150, 0)"} };
+    let canopyCoverObs = {x:[], y:[], mode:'markers', name:'Observation', marker: {color: "rgb(20, 120, 20)", size: 8} };
     for(let i=0; i<observations.length; i++){
         if(!isNaN(observations[i].canopyCoverObs) & typeof observations[i].canopyCoverObs === 'number'){
             canopyCoverObs.x.push( formatDatePlotly(observations[i].date)); 
@@ -1178,5 +1180,4 @@ function setSettings(settings){
         alert('Import project error.' + err.message + '. Your project might not be compatible with FDK version ' + version)
     }
 }
-
 

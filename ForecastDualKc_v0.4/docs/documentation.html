@@ -721,12 +721,12 @@ year | month | day| tempMax | tempMin |rhMax | rhMin | solarRad | windSpeed | pr
 <p><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mi>c</mi></msub></mrow><annotation encoding="application/x-tex">T_c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">c</span></span></span></span><span class="vlist-s">&#x200B;</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> is the total crop transpiration under non-stressed conditions at the end of the growing season</p>
 <h3 class="mume-header" id="48-nitrogen-recommendation">4.8 Nitrogen recommendation</h3>
 
-<p>The model computes the nitrogen recommendation based on the provided crop-specific nitrogen demand and the median yield goal. The model aims at improving yield goal estimates by narrowing down the range of probable yield outcomes and represents an improvement over the traditional yield goal approach defined at the beginning of the growing season.</p>
+<p>The model computes the nitrogen recommendation based on the provided crop-specific nitrogen demand and the median yield goal. Nitrogen levels do not affect model simulations, the updated yield goal is solely based on yield reductions based on soil water deficits. The recommended amount of nitrogen provided by the FDK model is the total amount of nitrogen that would be required by the crop without accounting for any existing soil nitrogen and mineralization rate. Users could use the most probable yield outcome together with external nitrogen recommentdation tools to calculate the amount of nitrogen fertilizer. The nitrogen recommendation is also saved for each scenario and is available in the model outputs.</p>
+<p>Recent research (Raun et al., 2017) shows that using yield goals is not an appropriate strategy for determining pre-plant fertilizer nitrogen rates. The FDK model aims at improving the estimation of the crop nitrogen demand by narrowing down the range of probable yield outcomes at the time of in-season nitrogen application. For the case of winter wheat in the U.S. Great Plains, forecasts in late February and early March (i.e. end of vernalization period) should provide a more accurate estimation of the plausible yield goal by accounting for soil moisture and canopy conditions since planting. The integration of observations of green canopy cover at this particular stage is key to account for the impact of snowfall events and low temperatures on the crop canopy. The canopy condition at any particular point during the growing season can be quantified using hand-held NDVI sensors or by measuring the percent of green canopy cover with tools like <a href="https://canopeoapp.com">Canopeo</a></p>
 <p><a name="datasets" href></a></p>
 <h2 class="mume-header" id="5-datasets">5. Datasets</h2>
 
-<p>The model ships with an example dataset for winter wheat in Stillwater, OK during the 2012-2013 growing season. More information about this dataset can be found in the following manuscript:</p>
-<p>Lollato, R.P. and Edwards, J.T., 2015. Maximum attainable wheat yield and resource&#x2010;use efficiency in the southern Great Plains. Crop Science, 55(6), pp.2863-2876.</p>
+<p>The model ships with an example dataset for winter wheat in Stillwater, OK during the 2012-2013 growing season. More information about this dataset can be found in (<a href="https://acsess.onlinelibrary.wiley.com/doi/full/10.2135/cropsci2015.04.0215">Lollato and Edwards, 2015</a>)</p>
 <p><a name="to-do-list" href></a></p>
 <h2 class="mume-header" id="6-to-do-list">6. To-Do List</h2>
 
@@ -758,6 +758,12 @@ year | month | day| tempMax | tempMin |rhMax | rhMin | solarRad | windSpeed | pr
 </li>
 <li>
 <p>Doorenbos, J. and Kassam, A.H., 1979. FAO irrigation and drainage paper No. 33 &#x201C;Yield response to water&#x201D;. FAO&#x2013;Food and Agriculture Organization of the United Nations, Rome.</p>
+</li>
+<li>
+<p>Lollato, R.P. and Edwards, J.T., 2015. Maximum attainable wheat yield and resource&#x2010;use efficiency in the southern Great Plains. Crop Science, 55(6), pp.2863-2876.</p>
+</li>
+<li>
+<p>Raun, W., Figueiredo, B., Dhillon, J., Fornah, A., Bushong, J., Zhang, H. and Taylor, R., 2017. Can yield goals be predicted?. Agronomy Journal, 109(5), pp.2389-2395.</p>
 </li>
 </ul>
 <p><a name="version" href></a></p>

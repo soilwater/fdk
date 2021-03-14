@@ -255,15 +255,17 @@ $T_c$ is the total crop transpiration under non-stressed conditions at the end o
 
 ### 4.8 Nitrogen recommendation
 
-The model computes the nitrogen recommendation based on the provided crop-specific nitrogen demand and the median yield goal. The model aims at improving yield goal estimates by narrowing down the range of probable yield outcomes and represents an improvement over the traditional yield goal approach defined at the beginning of the growing season.
+The model computes the nitrogen recommendation based on the provided crop-specific nitrogen demand and the median yield goal. Nitrogen levels do not affect model simulations, the updated yield goal is solely based on yield reductions based on soil water deficits. The recommended amount of nitrogen provided by the FDK model is the total amount of nitrogen that would be required by the crop without accounting for any existing soil nitrogen and mineralization rate. Users could use the most probable yield outcome together with external nitrogen recommentdation tools to calculate the amount of nitrogen fertilizer. The nitrogen recommendation is also saved for each scenario and is available in the model outputs.
+
+Recent research (Raun et al., 2017) shows that using yield goals is not an appropriate strategy for determining pre-plant fertilizer nitrogen rates. The FDK model aims at improving the estimation of the crop nitrogen demand by narrowing down the range of probable yield outcomes at the time of in-season nitrogen application. For the case of winter wheat in the U.S. Great Plains, forecasts in late February and early March (i.e. end of vernalization period) should provide a more accurate estimation of the plausible yield goal by accounting for soil moisture and canopy conditions since planting. The integration of observations of green canopy cover at this particular stage is key to account for the impact of snowfall events and low temperatures on the crop canopy. The canopy condition at any particular point during the growing season can be quantified using hand-held NDVI sensors or by measuring the percent of green canopy cover with tools like [Canopeo](https://canopeoapp.com)
 
 <a name="datasets"></a>
 
 ## 5. Datasets
 
-The model ships with an example dataset for winter wheat in Stillwater, OK during the 2012-2013 growing season. More information about this dataset can be found in the following manuscript:
+The model ships with an example dataset for winter wheat in Stillwater, OK during the 2012-2013 growing season. More information about this dataset can be found in ([Lollato and Edwards, 2015](https://acsess.onlinelibrary.wiley.com/doi/full/10.2135/cropsci2015.04.0215))
 
-Lollato, R.P. and Edwards, J.T., 2015. Maximum attainable wheat yield and resource‐use efficiency in the southern Great Plains. Crop Science, 55(6), pp.2863-2876.
+
 
 <a name="to-do-list"></a>
 
@@ -302,6 +304,10 @@ The core of the model was implemented in Javascript and contains no external dep
 - Allen, R.G., L.S. Pereira, D. Raes, and M. Smith. 1998. Crop evapotranspiration: Guidelines for computing crop water requirements, FAO Irrigation and Drainage Paper No. 56.
 
 - Doorenbos, J. and Kassam, A.H., 1979. FAO irrigation and drainage paper No. 33 “Yield response to water”. FAO–Food and Agriculture Organization of the United Nations, Rome.
+
+- Lollato, R.P. and Edwards, J.T., 2015. Maximum attainable wheat yield and resource‐use efficiency in the southern Great Plains. Crop Science, 55(6), pp.2863-2876.
+
+- Raun, W., Figueiredo, B., Dhillon, J., Fornah, A., Bushong, J., Zhang, H. and Taylor, R., 2017. Can yield goals be predicted?. Agronomy Journal, 109(5), pp.2389-2395.
   
 
 <a name="version"></a>
