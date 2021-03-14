@@ -7,7 +7,6 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-6S875T62E6');
     </script>
 
@@ -30,8 +29,8 @@
         <div class="nav-wrapper">
             <a href="#" class="brand-logo grey-text text-darken-3" style="font-size: 3rem; padding-left: 20px; font-weight: 600;">ForecastDualKc</a>
             <ul id="nav-mobile" class="right hide-on-med-and-down">
-            <li><a href="ForecastDualKc_v0.4/docs/documentation.html" target="_blank" class="deep-purple-text text-darken-1"><b>Docs</b></a></li>
-            <li><a href="https://github.com/soilwaterksu/forecastdualkc" class="deep-purple-text text-darken-1"><b>Github</b></a></li>
+            <li><a href="ForecastDualKc_v0.4/docs/documentation.html" target="_blank" class="deep-purple-text text-darken-1">Docs</a></li>
+            <li><a href="https://github.com/soilwaterksu/forecastdualkc" class="deep-purple-text text-darken-1">Github</a></li>
             </ul>
         </div>
     </nav>
@@ -44,7 +43,7 @@
             
             <ul class="collapsible expandable">
                 <li>
-                    <img src="icon.png" width=200 class="responsive-img center-align" style='margin-top: 20px; margin-bottom: 20px; padding-left: 10px;'>
+                    <img src="icon.png" width=180 class="responsive-img center-align" style='margin-top: 20px; margin-bottom: 20px; padding-left: 10px;'>
                 </li>
 
                 <!-- LOCATION CONTROLS -->
@@ -52,15 +51,17 @@
                     <div class="collapsible-header pink-text text-darken-2"><i class="material-icons">place</i>Location</div>
                     <div class="collapsible-body body-location">
                         <div class="row">
-                            <div class="input-field col s12 m12 l6 xl6">
+                            <div class="input-field col s12 m12 l12 xl12">
                                 <input value="example_field" id="projectName" type="text" class="validate">
                                 <div class="field-label">Name</div>
                             </div>
-                            <div class="input-field col s12 m12 l3 xl3">
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12 m12 l6 xl6">
                                 <input value="39.1" id="latitude" type="number" class="validate" min="-90" max="90" step="0.1">
                                 <div class="field-label">Latitude</div>
                             </div>
-                            <div class="input-field col s12 m12 l3 xl3">
+                            <div class="input-field col s12 m12 l6 xl6">
                                 <input value="300" id="altitude" type="number" class="validate" min="-100" max="8000" step="1">
                                 <div class="tooltipped field-label" data-position="bottom" data-tooltip="Meters above sea level">Altitude</div>
                             </div>
@@ -154,11 +155,11 @@
                                    
                         <div class="row">
                             <div class="col s12 m12 l6 xl6">
-                                <div id="yieldResponse" class="custom-slider tooltipped" data-position="top" data-tooltip="Susceptibility of yield components to seasonal water stress"></div>  
+                                <div id="yieldResponse" class="custom-slider tooltipped" data-position="top" data-tooltip="Susceptibility of yield components to seasonal water stress. Set equal to 1 to disable."></div>  
                                 <div id="yieldResponseSliderValue" class="field-label"></div>
                             </div>
                             <div class="col s12 m12 l6 xl6">
-                                <div id="yieldPotential" class="custom-slider tooltipped" data-position="top" data-tooltip="Yield goal for your field under non-limitating conditions."></div>  
+                                <div id="yieldPotential" class="custom-slider tooltipped" data-position="top" data-tooltip="Yield goal under non-limitating conditions."></div>  
                                 <div id="yieldPotentialSliderValue" class="field-label"></div>
                             </div>
                         </div>
@@ -230,16 +231,16 @@
                     <div class="collapsible-body body-nitrogen">
                         <div class="row">
                             <div class="input-field col s12 m12 l4 xl4">
-                                <input value="" id="medianYield" type="number" class="validate" min="0">
+                                <input value="" id="medianYieldGoal" type="number" min="0" readonly>
                                 <div class="field-label">Yield goal (Mg/ha)</div>
                             </div>
                             <div class="input-field col s12 m12 l4 xl4">
-                                <input value="30" id="Nreq" type="number" class="validate" min="0">
-                                <div class="field-label">N req. (kg N/Mg)</div>
+                                <input value="30" id="NDemand" type="number" class="validate" min="0" step="1" disabled>
+                                <div class="field-label">N demand (kg N/Mg)</div>
                             </div>
                             <div class="input-field col s12 m12 l4 xl4">
-                                <input value="" id="Ndemand" type="number" class="validate" min="0">
-                                <div class="field-label">N demand (kg/ha)</div>
+                                <input id="medianNRecommendation" type="number" min="0" readonly>
+                                <div class="field-label">N recommendation (kg/ha)</div>
                             </div>    
                         </div>
                     </div>
@@ -312,6 +313,20 @@
                     </div>
                 </li>
 
+                <!-- DESCRIPTION CONTROLS -->
+                <li>
+                    <div class="collapsible-header grey-text text-darken-2"><i class="material-icons">short_text</i>Description</div>
+                    <div class="collapsible-body body-generic">
+                        <form class="col s12">
+                            <div class="row">
+                            <div class="input-field col s12">
+                                <textarea id="projectDescription" class="materialize-textarea" rows="5" style="padding-top: 0px;" placeholder="Add a brief description for this project. Include references, links, DOI, and contact information."></textarea>
+                            </div>
+                            </div>
+                        </form>
+                    </div>
+                </li>
+
                 <!-- IMPORT/EXPORT-->
                 <li>
                     <div class="collapsible-header grey-text text-darken-2"><i class="material-icons">import_export</i>Import/Export Project</div>
@@ -328,7 +343,7 @@
                         <hr class="divider" style="margin-top: 50px; margin-bottom: 20px;">
 
                         <!-- EXPORT -->
-                        <p class="grey-text">Use this option to share, store, or further analyze FDK projects. Selecting "Settings" + "Inputs" will make your project fully reproducible by anyone.</p>
+                        <p class="grey-text">Use this option to share, store, or further analyze FDK projects. Selecting "Settings" + "Inputs" will make your project fully reproducible by anyone. Select "Outputs" to save model results for analysis outside FDK.</p>
                         <div class="row">
                             <div class="col sm12 m12 l6 xl6">
                                 <p>
@@ -357,19 +372,6 @@
                     
                 </li>
 
-                <!-- DESCRIPTION CONTROLS -->
-                <li>
-                    <div class="collapsible-header grey-text text-darken-2"><i class="material-icons">short_text</i>Description</div>
-                    <div class="collapsible-body body-generic">
-                        <form class="col s12">
-                            <div class="row">
-                            <div class="input-field col s12">
-                                <textarea id="projectDescription" class="materialize-textarea" rows="5" placeholder="Add a brief description for this project. Include references, links, DOI, and contact information."></textarea>
-                            </div>
-                            </div>
-                        </form>
-                    </div>
-                </li>
             </ul>
 
         </div> <!-- end of model controls -->
@@ -381,7 +383,7 @@
     <main>
 
         <div id="landing" style="padding:15vw; height: 85vh;">
-            <p class="grey-text center-align" style="font-size: 1.2rem;">Press  <a id="loadExampleDatasetBtn" class="btn waves-effect deep-purple darken-1">Play</a> to load some data and start using ForecastDualKc.
+            <p class="grey-text center-align" style="font-size: 1.2rem;">Press  <a id="loadExampleDatasetBtn" class="btn waves-effect deep-purple darken-1">Try</a> to load some data and start using ForecastDualKc.
                 You can also load your own climate and weather files. Use this <a class="btn waves-effect deep-purple darken-1" href="ForecastDualKc_v0.4/dataset/dataset.zip" download="example_dataset.zip">Example CSV dataset</a> to get started.</p>
         </div>
 
@@ -432,18 +434,6 @@
             <p class="grey-text" style="text-align: right; margin: 0px; padding-top: 0px; padding-right: 30px;">Soil Water Processes Lab - Kansas State University - Copyright <span id='copyrightYear'></span> - MIT License</p>
         </div>
     </footer>
-
-
-    <!-- Modal for error message -->
-    <div id="errorModal" class="modal modal-fixed-footer">
-        <div class="modal-content">
-            <p id="errorModalMsg"></p>
-        </div>
-        <div class="modal-footer">
-        <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
-        </div>
-    </div>
-
 
     <script src="ForecastDualKc_v0.4/libs/materialize.min.js"></script>
     <script src="ForecastDualKc_v0.4/libs/plotly_cartesian.min.js"></script>

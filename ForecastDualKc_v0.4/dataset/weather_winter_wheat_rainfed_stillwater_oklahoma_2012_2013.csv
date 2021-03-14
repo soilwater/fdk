@@ -1,4 +1,4 @@
-year,month,day,tempMax,tempMin,rhMax,rhMin,solarRad,windSpeed,precip,irrigation,surfaceSoilWaterObs,rootzoneSoilWaterObs,canopyCoverObs
+year,month,day,tempMax,tempMin,rhMax,rhMin,solarRad,windSpeed,precip,irrigation,surfaceSoilWater,rootzoneSoilWater,canopyCover
 2012,10,19,22.4,4.8,74.3,11,18.3,2.6,0,0,,,
 2012,10,20,29.3,4.1,83.6,27.9,17.3,1.4,0,0,,,
 2012,10,21,31.8,16.8,96.7,45.5,15.5,3.9,0,0,,,

@@ -1,6 +1,6 @@
 ///// CONTROL ELEMENTS /////
-version = 'ForecastDualKc_v0.4';
-console.log('Running ' + version);
+version = '0.4';
+console.log('Running ForecastDualKc version ' + version);
 document.getElementById('copyrightYear').innerText = new Date().getFullYear().toString()
 
 // Initialize Materialize controls
@@ -36,7 +36,7 @@ observationsInputElement.addEventListener('change', function(){
         observations = []; // Reset array
         readObservations()
     } catch(err){
-        document.getElementById("errorModalMsg").innerText = err.message;
+        alert('Weather data error. ' + err.message);
     }
 }, false);
 
@@ -46,10 +46,9 @@ let loadExampleDatasetBtn = document.getElementById('loadExampleDatasetBtn');
 loadExampleDatasetBtn.addEventListener('click', loadExampleDataset)
 
 function loadExampleDataset(){
-    fetch('ForecastDualKc_v0.3/dataset/example_field_settings_inputs_ForecastDualKc.json')
+    fetch('ForecastDualKc_v' + version + '/dataset/example_field_settings_inputs_FDK.json')
     .then( results=>results.text() )
     .then( data=>runUploadProject(JSON.parse(data)))
-    document.querySelector('.collapsible').M_Collapsible.open(6)
 }
 
 // Input box project name
@@ -100,8 +99,6 @@ managementDatesSlider.noUiSlider.on('update', function (values, handle) {
         forecastingDateSliderValue.innerHTML = 'Forecasting Date: ' + formatDateSlider(parseInt(values[handle]));
     }
 });
-
-
 
 // Slider depth surface layer
 let surfaceDepthSlider = document.getElementById('surfaceDepth');
@@ -261,6 +258,15 @@ let pTabSliderValue = document.getElementById('pTabSliderValue');
 noUiSlider.create(pTabSlider, { start: 0.5, range: {'min': 0.1, 'max': 0.8}, step: 0.05, format: wNumb({decimals: 2}) });
 pTabSlider.noUiSlider.on('update', function (values, handle) { pTabSliderValue.innerHTML = 'pTab: ' + values[handle]; });
 
+// Median yield goal
+let medianYieldGoalElement = document.getElementById('medianYieldGoal');
+
+// Input box nitrogen requirement
+let NDemandElement = document.getElementById('NDemand');
+NDemandElement.addEventListener('change', run);
+
+// Median nitrogen demand
+let medianNRecommendationElement = document.getElementById('medianNRecommendation');
 
 // Export Data
 let exportBtn = document.getElementById("exportBtn");
@@ -271,7 +277,7 @@ function exportProject(){
     let filename = geolocation.name + '_';
     let exportData = {};
     if(document.getElementById('exportSettingsBox').checked){
-        exportData.settings = {geolocation,soil,plant,management,options};
+        exportData.settings = {geolocation,description,soil,plant,management,nitrogen,options};
         filename += 'settings_'
     }
 
@@ -288,7 +294,7 @@ function exportProject(){
         filename += 'outputs_'
     }
     exportData.version = 'File generated with ' + version + ' - ' + new Date().toISOString();
-    exportBtn.download =  filename + 'ForecastDualKc.json';
+    exportBtn.download =  filename + 'FDK.json';
     exportBtn.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(exportData));
 }
 
@@ -321,6 +327,7 @@ function importProject(e){
 function runUploadProject(data){
     if(data.hasOwnProperty('settings') & data.hasOwnProperty('inputs')){
         setSettings(data.settings);
+        document.querySelector('.collapsible').M_Collapsible.open(6); // Open forecast dates so that users can quickly play with the model
         climate = data.inputs.climate;
         observations = data.inputs.observations;
         run()
@@ -332,7 +339,6 @@ function runUploadProject(data){
 }
 
 
-
 ///// EVENTLISTENERS /////
 document.querySelectorAll('.custom-slider').forEach(item => {
     item.noUiSlider.on('change', run);
@@ -341,6 +347,7 @@ document.querySelectorAll('.custom-slider').forEach(item => {
 
 // ENABLE DISABLE SLIDERS
 function enableSliders(){
+    NDemandElement.removeAttribute('disabled');
     document.querySelectorAll('.custom-slider').forEach(item => {
         item.removeAttribute('disabled');
     })
@@ -357,6 +364,7 @@ let outputs = {};
 let stats = {};
 let plant = {};
 let soil = {};
+let nitrogen = {};
 let management = {};
 let geolocation = {};
 let options = {};
@@ -393,7 +401,6 @@ function readClimate (){
 
         observationsInputElement.disabled = false;
         if(observationsHaveBeenLoaded){run()}
-
     }
     reader.readAsText(climateInputElement.files[0])
 }
@@ -465,10 +472,13 @@ function run(){
 ///// COLLECT UP MODEL settings /////
 function collectModelSettingsFromDOM(){
     geolocation = { name: projectNameElement.value,
-                    description: projectDescriptionElement.value,
                     altitude: parseFloat(altitudeElement.value), 
                     latitude: parseFloat(latitudeElement.value),
     };
+
+    description = {
+        description: projectDescriptionElement.value
+    }
 
     plant = {KcbIni: parseFloat(KcbIniSlider.noUiSlider.get()),
             KcbMid: parseFloat(KcbMidSlider.noUiSlider.get()),
@@ -504,6 +514,8 @@ function collectModelSettingsFromDOM(){
                   endDate: managementDatesSlider.noUiSlider.options.range.max
     };
 
+    nitrogen = {NDemand: parseFloat(NDemandElement.value)};
+
     options = {
         visualizeScenarios: visualizeScenarios.checked,
         assimilateCanopyCoverObservations: assimilateCanopyCoverObservations.checked,
@@ -534,6 +546,7 @@ function model(){
     outputs.grainYield = [];
     outputs.Ke = [];
     outputs.Kcb = [];
+    outputs.NRecommendation = [];
 
     let k = 0, L = climate.length;
     while(k < L){
@@ -584,6 +597,7 @@ function model(){
             let RAW;
             let depletionOfNewRootLength;
             let grainYield;
+            let NRecommendation;
             let simulationDate;
 
             // Compute constant evaporation variables
@@ -763,7 +777,6 @@ function model(){
                     }
                 }
 
-                
                 // Terminate growing season and save results
                 if(thermalUnitsCumulative[n] >= plant.lateThermalUnits || k+1 >= climate.length){
 
@@ -772,7 +785,10 @@ function model(){
                     grainYield = Math.max(grainYield,0);
                     //grainYield =  transpirationCumulative[n] * 20/1000;
 
-                    // Save output variables
+                    // Compute N demand
+                    NRecommendation = grainYield * parseFloat(NDemandElement.value);
+
+                    // Set temporal scale
                     let currentYear = climate[k].year;
                     if(xAxisVariableMenu.value === 'date'){
                         xVariable = growingSeasonDate;
@@ -792,7 +808,8 @@ function model(){
                     outputs.soilWaterSurface.push({x:xVariable, y:soilWaterSurface, mode:'line', name:"Y"+currentYear, line: {color: lineColor} });
                     outputs.canopyCover.push({x:xVariable, y:fc, mode:'line', name:"Y"+currentYear, line: {color: lineColor}});
                     outputs.thermalUnitsCumulative.push({x:xVariable, y:thermalUnitsCumulative, mode:'line', name:"Y"+currentYear, line: {color: lineColor}});
-                    outputs.grainYield.push({x:currentYear, y:grainYield})
+                    outputs.grainYield.push({x:currentYear, y:grainYield});
+                    outputs.NRecommendation.push({x:currentYear, y:NRecommendation})
                     outputs.evaporationCumulative.push({x:xVariable, y:evaporationCumulative, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: lineColor}});
                     outputs.transpirationCumulative.push({x:xVariable, y:transpirationCumulative, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: lineColor}});
                     outputs.evaporation.push({x:xVariable, y:E, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: lineColor}});
@@ -818,13 +835,15 @@ function model(){
 function summaryStats(){
 
     // Compute cumulative probability yield
-    let yieldN = outputs.grainYield.length;
+    let yieldN = outputs.grainYield.length; // Same as length of NRecommendation
     let yieldXProb = [];
     let yieldYProb = [];
+    let NRecommendationAll = [];
     for(let i=0; i<yieldN; i++){
         yieldXProb.push(outputs.grainYield[i].y);
         //yieldYProb.push((i+1)/yieldN);
         yieldYProb.push( 1 - ((i+1)/yieldN));
+        NRecommendationAll.push(outputs.NRecommendation[i].y)
     }
     yieldXProb = yieldXProb.sort();
     let grainYieldCumulativeProbability = {x:yieldXProb, y:yieldYProb, mode:'line'};
@@ -888,14 +907,18 @@ function summaryStats(){
     // Yield Cumulative Probability
     stats.grainYieldCumulativeProbability = [grainYieldCumulativeProbability];
 
-    // Nitrogen variables
-    let updatedYieldGoal = Math.round(percentile(yieldXProb, 50)*100)/100;
-    let cropNitrogenDemand = Math.round(updatedYieldGoal * parseFloat(document.getElementById('Nreq').value));
-    document.getElementById('medianYield').value = updatedYieldGoal;
-    document.getElementById('Ndemand').value = cropNitrogenDemand;
+    // Compute most probable yield goal
+    stats.medianYieldGoal = Math.round(percentile(yieldXProb, 50)*100)/100;
+
+    // Compute nitrogen demand
+    stats.medianNRecommendation = Math.round(percentile(NRecommendationAll, 50));
+    
 }
 
 function updatePlots(){
+    medianYieldGoalElement.value = stats.medianYieldGoal;
+    medianNRecommendationElement.value = stats.medianNRecommendation;
+
     config = {modeBarButtonsToRemove: ['hoverCompareCartesian', 'lasso2d'], responsive: true};
 
     Plotly.react('plotSoilWater', stats.soilWater, { yaxis: {title: "Rootzone Soil Water (mm)"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
@@ -1009,7 +1032,6 @@ function computeReferenceET(geolocation,atmos,cover='grass') {
     return Math.round(ETo*100)/100;
 }
 
-
 function getDayOfYear(date) {
     let januaryFirst = new Date("1-Jan-" + new Date(date).getFullYear());
     let doy = Math.floor((date - januaryFirst + 86400000)/86400000);
@@ -1097,6 +1119,9 @@ function computeTrend(inputVar,p){
 
 
 function setSettings(settings){
+
+    try{
+
     // Plant
     KcbIniSlider.noUiSlider.set([settings.plant.KcbIni]);
     KcbMidSlider.noUiSlider.set([settings.plant.KcbMid]);
@@ -1125,11 +1150,16 @@ function setSettings(settings){
     wettedFractionSlider.noUiSlider.set([settings.soil.wettedFraction])
     curveNumberSlider.noUiSlider.set([settings.soil.curveNumber])
 
+    // Nitrogen
+    NDemandElement.innerText = settings.nitrogen.NDemand;
+
     // Location
     projectNameElement.innerText = settings.geolocation.name;
-    projectDescriptionElement.innerText = settings.geolocation.description;
     latitudeElement.innerText = settings.geolocation.latitude;
     altitudeElement.innerText = settings.geolocation.altitude;
+
+    // Description
+    projectDescriptionElement.innerText = settings.description.description;
 
     // Management
     let startDate = new Date(settings.management.plantingDate).getTime() ;
@@ -1143,8 +1173,10 @@ function setSettings(settings){
     assimilateCanopyCoverObservations.checked = settings.options.assimilateCanopyCoverObservations;
     assimilateSoilMoistureObservations.checked = settings.options.assimilateSoilMoistureObservations; 
     constantRootDepth.checked = settings.options.constantRootDepth;
-    constantPlantHeight.checked = settings.options.constantPlantHeight; 
-
+    constantPlantHeight.checked = settings.options.constantPlantHeight;
+    } catch(err){
+        alert('Import project error.' + err.message + '. Your project might not be compatible with FDK version ' + version)
+    }
 }
 
 
