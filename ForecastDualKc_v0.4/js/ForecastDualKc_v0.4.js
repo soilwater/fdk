@@ -546,6 +546,7 @@ function model(){
     outputs.grainYield = [];
     outputs.Ke = [];
     outputs.Kcb = [];
+    outputs.Kc = [];
     outputs.NRecommendation = [];
 
     let k = 0, L = climate.length;
@@ -571,6 +572,7 @@ function model(){
             let ETcrop = [];
             let Ke = [];
             let Kcb = [];
+            let Kc = [];
             let Ks = [];
             let RO = [];
             let De = [];
@@ -664,6 +666,7 @@ function model(){
                     DPr[n] = Math.max(0, (precip - RO[n]) + irrigation[n] - ETcrop[n] - Dr[n]);  // Eq. 88, FAO-56, drainage of water from the bottom of the root zone
                     
                     // Additional metrics
+                    Kc[n] = Ke[n] + Kcb[n];
                     E[n] = Ke[n] * ETref; // Soil evaporation (mm)
                     T[n] = Ks[n] * Kcb[n] * ETref; // Transpiration on first day.
                     evaporationCumulative[n] = E[n];
@@ -704,7 +707,8 @@ function model(){
                     if(thermalUnitsCumulative[n] < plant.emergenceThermalUnits){
                         fc[n] = 0;
                     } else if (thermalUnitsCumulative[n] >= plant.emergenceThermalUnits && thermalUnitsCumulative[n] < plant.devThermalUnits){
-                        fc[n] = Math.min( fc[n-1] + thermalUnits/(plant.devThermalUnits - plant.emergenceThermalUnits),0.95)
+                        fc[n] = Math.min( fc[n-1] + thermalUnits/(plant.devThermalUnits - plant.emergenceThermalUnits), 0.98)
+                        //fc[n] = Math.min( fc[n-1] + (Kcb[n] - plant.KcbIni)/(plant.KcbMid - plant.KcbIni), 0.98)
                     } else if (thermalUnitsCumulative[n] >= plant.devThermalUnits && thermalUnitsCumulative[n] < plant.midThermalUnits){
                         fc[n] = fc[n-1];
                     } else {
@@ -747,6 +751,7 @@ function model(){
                     Dr[n] = Math.min(Dr[n], TAW[n]); // Eq. 86, FAO-56
 
                     // Additional metrics
+                    Kc[n] = Ke[n] + Kcb[n];
                     E[n] = Ke[n] * ETref; // Soil evaporation (mm)
                     T[n] = Ks[n] * Kcb[n] * ETref; // Estimated crop transpiration
                     evaporationCumulative[n] = evaporationCumulative[n-1] + E[n];
@@ -816,6 +821,7 @@ function model(){
                     outputs.transpiration.push({x:xVariable, y:T, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: lineColor}});
                     outputs.Ke.push({x:xVariable, y:Ke, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: lineColor}});
                     outputs.Kcb.push({x:xVariable, y:Kcb, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: lineColor}});
+                    outputs.Kc.push({x:xVariable, y:Kc, mode:'line', name:"Y"+currentYear, showlegend: false, line: {color: lineColor}});
                     inGrowingSeason = false; // This will break the current while loop
                 }
 
@@ -881,16 +887,28 @@ function summaryStats(){
     stats.ETrefCumulative = [ETrefCumulative25, ETrefCumulative75, ETrefCumulative50];
 
     // Precip Cumulative
-    let precipCumulative25 = {x: xForecasts, y:computeTrend(outputs.precipCumulative, 25), mode:'line', line: {color: "rgb(68, 23, 225)", dash: 'dot'}, name: "Lower Bound"};
+    let precipCumulative25 = {x: xForecasts, y:computeTrend(outputs.precipCumulative, 25), mode:'line', line: {color: "rgb(68, 23, 225)", dash: 'dot'}, name: "Lower Bound Precipitation"};
     let precipCumulative50 = {x: xForecasts, y:computeTrend(outputs.precipCumulative, 50), mode:'line', line: {color: "rgb(68, 23, 225)"}, name: "Median Precipitation"};
-    let precipCumulative75 = {x: xForecasts, y:computeTrend(outputs.precipCumulative, 75), mode:'line', line: {color: "rgb(68, 23, 225)", dash: 'dot'}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Upper Bound"};
+    let precipCumulative75 = {x: xForecasts, y:computeTrend(outputs.precipCumulative, 75), mode:'line', line: {color: "rgb(68, 23, 225)", dash: 'dot'}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Upper Bound Precipitation"};
     stats.precipCumulative = [precipCumulative25, precipCumulative75, precipCumulative50];
 
     // Thermal Units Cumulative
-    let thermalUnitsCumulative25 = {x: xForecasts, y:computeTrend(outputs.thermalUnitsCumulative, 25), mode:'line', line: {color: "rgb(230, 81, 0)", dash: 'dot'}, name: "Lower Bound"};
-    let thermalUnitsCumulative50 = {x: xForecasts, y:computeTrend(outputs.thermalUnitsCumulative, 50), mode:'line', line: {color: "rgb(230, 81, 0)"}, name: "Median Thermal Units"};
-    let thermalUnitsCumulative75 = {x: xForecasts, y:computeTrend(outputs.thermalUnitsCumulative, 75), mode:'line', line: {color: "rgb(230, 81, 0)", dash: 'dot'}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Upper Bound"};
+    let thermalUnitsCumulative25 = {x: xForecasts, y:computeTrend(outputs.thermalUnitsCumulative, 25), mode:'line', line: {color: "rgb(230, 81, 0)", dash: 'dot'}, name: "Lower Bound Thermal Units", yaxis: 'y2'};
+    let thermalUnitsCumulative50 = {x: xForecasts, y:computeTrend(outputs.thermalUnitsCumulative, 50), mode:'line', line: {color: "rgb(230, 81, 0)"}, name: "Median Thermal Units", yaxis: 'y2'};
+    let thermalUnitsCumulative75 = {x: xForecasts, y:computeTrend(outputs.thermalUnitsCumulative, 75), mode:'line', line: {color: "rgb(230, 81, 0)", dash: 'dot'}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Upper Bound Thermal Units", yaxis: 'y2'};
     stats.thermalUnitsCumulative = [thermalUnitsCumulative25, thermalUnitsCumulative75, thermalUnitsCumulative50];
+
+    // Basal Crop Coefficients
+    let Kcb25 = {x: xForecasts, y:computeTrend(outputs.Kcb, 25), mode:'line', line: {color: "rgb(0, 180, 0)", dash: 'dot'}, name: "Lower Bound Kcb", showlegend: true};
+    let Kcb50 = {x: xForecasts, y:computeTrend(outputs.Kcb, 50), mode:'line', line: {color: "rgb(0, 180, 0)"}, name: "Median Kcb"};
+    let Kcb75 = {x: xForecasts, y:computeTrend(outputs.Kcb, 75), mode:'line', line: {color: "rgb(0, 180, 0)", dash: 'dot'}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Upper Bound Kcb", showlegend: true};
+    stats.Kcb = [Kcb25, Kcb75, Kcb50];
+
+    // Crop Coefficient
+    let Kc25 = {x: xForecasts, y:computeTrend(outputs.Kc, 25), mode:'line', line: {color: "rgb(255, 23, 68)", dash: 'dot'}, name: "Lower Bound Kc", showlegend: true};
+    let Kc50 = {x: xForecasts, y:computeTrend(outputs.Kc, 50), mode:'line', line: {color: "rgb(255, 23, 68)"}, name: "Median Kc"};
+    let Kc75 = {x: xForecasts, y:computeTrend(outputs.Kc, 75), mode:'line', line: {color: "rgb(255, 23, 68)", dash: 'dot'}, fill: "tonexty", fillcolor: "rgba(68, 68, 68, 0.2)", name: "Upper Bound Kc", showlegend: true};
+    stats.Kc = [Kc25, Kc75, Kc50];
 
     // Evaporation Cumulative
     let evaporationCumulative25 = {x: xForecasts, y:computeTrend(outputs.evaporationCumulative, 25), mode:'line', line: {color: "rgb(255, 23, 68)", dash: 'dot'}, name: "Lower Bound", showlegend: false};
@@ -921,19 +939,22 @@ function updatePlots(){
     medianNRecommendationElement.value = stats.medianNRecommendation;
 
     // Update charts
-    config = {modeBarButtonsToRemove: ['hoverCompareCartesian', 'lasso2d'], responsive: true};
+    config = {modeBarButtonsToRemove: ['hoverCompareCartesian', 'lasso2d'], responsive: true, };
 
     Plotly.react('plotSoilWater', stats.soilWater, { yaxis: {title: "Rootzone Soil Water (mm)"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
     Plotly.react('plotSurfaceSoilWater', stats.soilWaterSurface, { yaxis: {title: "Surface Soil Water (mm)"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
     Plotly.react('plotCanopyCover', stats.canopyCover, { yaxis: {title: "Fraction Canopy Cover"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
     Plotly.react('plotETCumulative', stats.ETcropCumulative, { yaxis: {title: "Cumulative ET (mm)"}, autosize: true, showlegend: true, legend: {x: 1, xanchor: 'right', y: 1.1, orientation:"h"}, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
-    Plotly.react('plotPrecipCumulative', stats.precipCumulative, { yaxis: {title: "Cumulative Precipitation (mm)"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
-    Plotly.react('plotThermalUnitsCumulative', stats.thermalUnitsCumulative, { yaxis: {title: "Thermal Units (C-day)"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
-    Plotly.react('plotETPartitionCumulative', stats.evaporationCumulative, { yaxis: {title: "ET components (mm)"}, autosize: true, showlegend: true, legend: {x: 1, xanchor: 'right', y: 1.1, orientation:"h"}, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
+    Plotly.react('plotPrecipCumulative', stats.precipCumulative, { xaxis: {showspikes: true,spikemode: 'toaxis'}, yaxis: {title: "Cumulative Precipitation (mm)", showspikes: true,spikemode: 'toaxis'}, yaxis2: {title: 'Cumulative Thermal Units (C-day)', overlaying: 'y', side: 'right', showspikes: true,spikemode: 'toaxis'}, autosize: true, showlegend: true, legend: {x: 0, xanchor: 'left', y: 1.1, orientation:"h"}, hovermode:'closest', margin: {l:80, r:50, t:10, b:80} }, config);
+    Plotly.react('plotCropCoefficient', stats.Kcb, { yaxis: {title: "Crop Coefficient"},autosize: true, showlegend: true, legend: {x: 0, xanchor: 'left', y: 1.1, orientation:"h"}, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
+    Plotly.react('plotETPartitionCumulative', stats.evaporationCumulative, { yaxis: {title: "ET components (mm)"}, autosize: true, showlegend: true, legend: {x: 0, xanchor: 'left', y: 1.1, orientation:"h"}, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
     Plotly.react('plotGrainYield', stats.grainYieldCumulativeProbability, { xaxis: {title: "Estimated Grain Yield (Mg/ha)"}, yaxis: {title: "1 - Cumulative Probability"}, autosize: true, showlegend: false, hovermode:'closest', margin: {l:80, r:20, t:10, b:80} }, config);
     
     Plotly.addTraces('plotETCumulative', stats.ETrefCumulative);
+    Plotly.addTraces('plotPrecipCumulative', stats.thermalUnitsCumulative);
     Plotly.addTraces('plotETPartitionCumulative', stats.transpirationCumulative);
+    Plotly.addTraces('plotCropCoefficient', stats.Kc);
+
 
     if(visualizeScenarios.checked){
         let N = [...Array(outputs.soilWater.length).keys()]; // generate values from 0 to N-1 using new notation
@@ -943,7 +964,8 @@ function updatePlots(){
         Plotly.addTraces('plotETCumulative', outputs.ETcropCumulative, N);
         Plotly.addTraces('plotETCumulative', outputs.ETrefCumulative, N);
         Plotly.addTraces('plotPrecipCumulative', outputs.precipCumulative, N);
-        Plotly.addTraces('plotThermalUnitsCumulative', outputs.thermalUnitsCumulative, N);
+        //Plotly.addTraces('plotPrecipCumulative', N);
+        Plotly.addTraces('plotCropCoefficient', outputs.Kcb, N);
         Plotly.addTraces('plotETPartitionCumulative', outputs.evaporationCumulative, N);
         Plotly.addTraces('plotETPartitionCumulative', outputs.transpirationCumulative, N);
     }
@@ -951,7 +973,7 @@ function updatePlots(){
 
 
 function addFieldObservationsToPlot(){
-    let soilWaterObs = {x:[], y:[], mode:'markers', name:'Observation', marker: {color: "rgb(20, 120, 20)", size: 8} };
+    let soilWaterObs = {x:[], y:[], mode:'markers', name:'Observation', marker: {color: "rgba(55, 255, 150, 0.7)", size: 10, line: {color: 'rgb(20, 20, 20)', width: 2}} };
     for(let i=0; i<observations.length; i++){
         if(!isNaN(observations[i].rootzoneSoilWaterObs) & typeof observations[i].rootzoneSoilWaterObs === 'number'){
             soilWaterObs.x.push( formatDatePlotly(observations[i].date)); 
@@ -959,8 +981,8 @@ function addFieldObservationsToPlot(){
         }
     }
     Plotly.addTraces('plotSoilWater', soilWaterObs);
-
-    let surfaceSoilWaterObs = {x:[], y:[], mode:'markers', name:'Observation', marker: {color: "rgb(20, 120, 20)", size: 8}};
+    
+    let surfaceSoilWaterObs = {x:[], y:[], mode:'markers', name:'Observation', marker: {color: "rgba(55, 255, 150, 0.7)", size: 10, line: {color: 'rgb(20, 20, 20)', width: 2}} };
     for(let i=0; i<observations.length; i++){
         if(!isNaN(observations[i].surfaceSoilWaterObs) & typeof observations[i].surfaceSoilWaterObs === 'number'){
             surfaceSoilWaterObs.x.push( formatDatePlotly(observations[i].date)); 
@@ -969,7 +991,7 @@ function addFieldObservationsToPlot(){
     }
     Plotly.addTraces('plotSurfaceSoilWater', surfaceSoilWaterObs);
 
-    let canopyCoverObs = {x:[], y:[], mode:'markers', name:'Observation', marker: {color: "rgb(20, 120, 20)", size: 8} };
+    let canopyCoverObs = {x:[], y:[], mode:'markers', name:'Observation', marker: {color: "rgba(55, 255, 150, 0.7)", size: 10, line: {color: 'rgb(20, 20, 20)', width: 2}} };
     for(let i=0; i<observations.length; i++){
         if(!isNaN(observations[i].canopyCoverObs) & typeof observations[i].canopyCoverObs === 'number'){
             canopyCoverObs.x.push( formatDatePlotly(observations[i].date)); 
@@ -1153,15 +1175,15 @@ function setSettings(settings){
     curveNumberSlider.noUiSlider.set([settings.soil.curveNumber])
 
     // Nitrogen
-    NDemandElement.innerText = settings.nitrogen.NDemand;
+    NDemandElement.value = settings.nitrogen.NDemand;
 
     // Location
-    projectNameElement.innerText = settings.geolocation.name;
-    latitudeElement.innerText = settings.geolocation.latitude;
-    altitudeElement.innerText = settings.geolocation.altitude;
+    projectNameElement.value = settings.geolocation.name;
+    latitudeElement.value = settings.geolocation.latitude;
+    altitudeElement.value = settings.geolocation.altitude;
 
     // Description
-    projectDescriptionElement.innerText = settings.description.description;
+    projectDescriptionElement.value = settings.description.description;
 
     // Management
     let startDate = new Date(settings.management.plantingDate).getTime() ;
