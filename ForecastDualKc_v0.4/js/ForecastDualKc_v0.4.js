@@ -441,14 +441,15 @@ function readObservations (){
         e.target.value = '';
 
         let L = observations.length-1;
-        let N = Math.max(L-15,0);
+        let N = Math.max(L-30,0);
         let startDate = timestamp(observations[0].year, observations[0].month, observations[0].day);
         let endDate = timestamp(observations[L].year, observations[L].month, observations[L].day);
+        let plantingDate = timestamp(observations[0].year, observations[0].month, observations[0].day);
         let forecastDate = timestamp(observations[N].year, observations[N].month, observations[N].day);
 
         // Update management slider with observations boundaries
         managementDatesSlider.noUiSlider.updateOptions( {range: {'min': startDate, 'max': endDate} }); // Update the range of the date slider       
-        managementDatesSlider.noUiSlider.set([startDate,forecastDate]); // Set the date slider using the first and last dates of the observations dataset
+        managementDatesSlider.noUiSlider.set([plantingDate,forecastDate]); // Set the date slider using the first and last dates of the observations dataset
         
         observationsHaveBeenLoaded = true;
         run()
@@ -511,6 +512,7 @@ function collectModelSettingsFromDOM(){
     management = {plantingDate: new Date(parseInt(managementDatesSlider.noUiSlider.get()[0])), 
                   forecastingDate: new Date(parseInt(managementDatesSlider.noUiSlider.get()[1])),
                   plantingToForecast: ( parseInt(managementDatesSlider.noUiSlider.get()[1]) - parseInt(managementDatesSlider.noUiSlider.get()[0]) )/86400000,
+                  startDate: managementDatesSlider.noUiSlider.options.range.min,
                   endDate: managementDatesSlider.noUiSlider.options.range.max
     };
 
@@ -1186,11 +1188,12 @@ function setSettings(settings){
     projectDescriptionElement.value = settings.description.description;
 
     // Management
-    let startDate = new Date(settings.management.plantingDate).getTime() ;
-    let forecastDate = new Date(settings.management.forecastingDate).getTime();
+    let startDate = new Date(settings.management.startDate).getTime();
     let endDate = new Date(settings.management.endDate).getTime();
+    let plantingDate = new Date(settings.management.plantingDate).getTime();
+    let forecastDate = new Date(settings.management.forecastingDate).getTime();
     managementDatesSlider.noUiSlider.updateOptions( {range: {'min': startDate, 'max': endDate} }); // Update the range of the date slider       
-    managementDatesSlider.noUiSlider.set([startDate,forecastDate]);
+    managementDatesSlider.noUiSlider.set([plantingDate,forecastDate]);
 
     // Options
     visualizeScenarios.checked = settings.options.visualizeScenarios;
