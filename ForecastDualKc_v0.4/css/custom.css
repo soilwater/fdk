@@ -34,7 +34,8 @@ li p{
 }
 
 .field-label{
-    line-height: 1.5;
+    line-height: 1.3;
+    font-size: 0.97rem;
 }
 
 .body-location{
@@ -83,11 +84,14 @@ li p{
     height: 350px;
 }
 
-
 .model-controls {
     padding-left: 10px;
     padding-right: 5px;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
+}
+
+.model-controls .row{
+    padding-bottom: 25px;
 }
 
 ul .row{

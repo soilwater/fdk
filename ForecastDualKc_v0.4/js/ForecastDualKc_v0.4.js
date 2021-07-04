@@ -662,7 +662,6 @@ function model(){
                     RAW = p * TAW[n]; // Eq. 83, FAO-56, readily plant available water capacity (mm)
                     Dr[n]  = 1000 * (soil.upperLimit - soil.thetaInitialRootzone) * Z[n];  // Initial depletion of root zone
                     Dr[n]  = Math.min(Dr[n],TAW[n]);    // Set Max Dr0: Dr0 cannot exceed TAW:  physically this cannot happen, but may arise when initial soil water content is low
-                    //Dr[n]  = Math.max(Dr[n],0);
                     if (Dr[n] < RAW) {Ks[n] = 1} else {Ks[n] = (TAW[n] - Dr[n]) / (TAW[n] - RAW)} // Eq. 84, FAO-56, transpiration reduction factor
                     ETcrop[n] = (Ks[n] * Kcb[n] + Ke[n]) * ETref; // Eq. 80, FAO-56, total crop water use for the day (mm)
                     DPr[n] = Math.max(0, (precip - RO[n]) + irrigation[n] - ETcrop[n] - Dr[n]);  // Eq. 88, FAO-56, drainage of water from the bottom of the root zone
@@ -710,12 +709,11 @@ function model(){
                         fc[n] = 0;
                     } else if (thermalUnitsCumulative[n] >= plant.emergenceThermalUnits && thermalUnitsCumulative[n] < plant.devThermalUnits){
                         fc[n] = Math.min( fc[n-1] + thermalUnits/(plant.devThermalUnits - plant.emergenceThermalUnits), 0.98)
-                        //fc[n] = Math.min( fc[n-1] + (Kcb[n] - plant.KcbIni)/(plant.KcbMid - plant.KcbIni), 0.98)
                     } else if (thermalUnitsCumulative[n] >= plant.devThermalUnits && thermalUnitsCumulative[n] < plant.midThermalUnits){
                         fc[n] = fc[n-1];
                     } else {
-                        fc[n] = Math.max(fc[n-1] + (Kcb[n] - Kcb[n-1]), 0);
-                        //fc[n] = Math.max(fc[n-1] - thermalUnits/(plant.lateThermalUnits - plant.midThermalUnits), 0);
+                        //fc[n] = Math.max(fc[n-1] + (Kcb[n] - Kcb[n-1]), 0);
+                        fc[n] = Math.max(fc[n-1] - (thermalUnitsCumulative[n] - plant.midThermalUnits) / (plant.lateThermalUnits - plant.midThermalUnits), 0);
                     }
 
                     few = Math.min(1 - fc[n], soil.wettedFraction);
@@ -733,6 +731,7 @@ function model(){
                     }
                     DPe[n]= Math.max(0, (precip - RO[n]) + irrigation[n]/soil.wettedFraction - De[n-1]); // Eq. 79, FAO-56 Drainage of water from the bottom of the evaporating layer
                     Ke[n] = Math.min(few * KcMax, Kr * (KcMax - Kcb[n])); // Eq. 71, FAO-56, soil evaporation coefficient
+                    
                     De[n] = De[n-1] - (precip - RO[n]) - irrigation[n]/soil.wettedFraction +  (Ke[n] * ETref)/few + DPe[n]; // Eq. 77, FAO-56, Evaporative layer depletion. E = (Ke[n] * ETref)
                     De[n] = Math.min(TEW, De[n]); // Depletion cannot exceed TEW, required because F is not constrained. TEW was TEW[i]
                     p = plant.pTab + 0.04 * (5 - Kcb[n] * ETref); // Fig. 41, FAO-56
@@ -749,7 +748,7 @@ function model(){
                     DPr[n] = Math.max((precip - RO[n]) + irrigation[n] - ETcrop[n] - Dr[n-1], 0);  // Eq. 88, FAO-56, drainage of water from the bottom of the root zone
                     depletionOfNewRootLength = 1000 * (soil.upperLimit - (soil.upperLimit + soil.lowerLimit)/2 ) * (Z[n] - Z[n-1]); // Estimate additional deficit of new root length. See Box 5 in Example 38
                     Dr[n] = Dr[n-1] - (precip - RO[n]) - irrigation[n] + ETcrop[n] + DPr[n] + depletionOfNewRootLength;// Eq. 85, FAO-56, root zone depletion at the end of the day
-                    //Dr[n] = Math.max(Dr[n], 0); // Eq. 85, FAO-56
+                    Dr[n] = Math.max(Dr[n], 0); // Eq. 85, FAO-56
                     Dr[n] = Math.min(Dr[n], TAW[n]); // Eq. 86, FAO-56
 
                     // Additional metrics
@@ -771,7 +770,6 @@ function model(){
                 if(assimilateSoilMoistureObservations.checked && n < management.plantingToForecast){
                     if(!isNaN(observations[n].surfaceSoilWaterObs) & typeof observations[n].surfaceSoilWaterObs === 'number'){
                         De[n] = (soil.upperLimit * soil.surfaceDepth * 1000) - observations[n].surfaceSoilWaterObs;
-                        //De[n] = Math.max(De[n],0);
                     }
                     if(!isNaN(observations[n].rootzoneSoilWaterObs) & typeof observations[n].rootzoneSoilWaterObs  === 'number'){
                         Dr[n] = (soil.upperLimit * plant.rootDepth * 1000) - observations[n].rootzoneSoilWaterObs;
@@ -790,7 +788,6 @@ function model(){
                     // Compute grain yield
                     grainYield = plant.yieldPotential * (1 - plant.yieldResponse * (1 - transpirationCumulative[n]/transpirationCumulativeNoStress[n])); // Similar to Eq. 90, FAO-56 (based on FAO-33)
                     grainYield = Math.max(grainYield,0);
-                    //grainYield =  transpirationCumulative[n] * 20/1000;
 
                     // Compute N demand
                     NRecommendation = grainYield * parseFloat(NDemandElement.value);
